@@ -4,157 +4,243 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#1e3a8a" />
-<meta name="description" content="We Do Recover: find the next meeting near you. AA, NA, SMART, Refuge Recovery, Women for Sobriety, S.O.S., LifeRing, She Recovers, Celebrate Recovery. Free, no account, all pathways welcome." />
 <title>We Do Recover — meeting finder</title>
 <link rel="manifest" href="/manifest.json" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Karla:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
-  :root{--paper:#f9fafb;--card:#ffffff;--ink:#1f2937;--ink-soft:#6b7280;--blue:#1e3a8a;--blue-light:#3b82f6;--amber:#f59e0b;--line:#e5e7eb;--radius:14px}
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html{scroll-behavior:smooth}
-  body{font-family:'Karla',system-ui,sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
-  .wrap{max-width:720px;margin:0 auto;padding:0 16px}
-  header{background:var(--blue);color:#fff;padding:20px 0 18px;padding-top:calc(20px + env(safe-area-inset-top))}
-  header h1{font-family:'Fraunces',serif;font-weight:600;font-size:26px;letter-spacing:-.01em}
-  header p{font-size:13.5px;color:#dbeafe;margin-top:4px;line-height:1.5}
-  .controls{position:sticky;top:0;z-index:20;background:var(--paper);padding:12px 16px 10px;border-bottom:1px solid var(--line)}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .seg{display:flex;background:#e0e7ff;border-radius:999px;padding:3px;flex:0 0 auto;overflow-x:auto;max-width:100%;scrollbar-width:thin}
-  .seg::-webkit-scrollbar{height:3px}
-  .seg::-webkit-scrollbar-thumb{background:#bfdbfe}
-  .seg button{border:0;background:transparent;font:inherit;font-weight:700;font-size:13px;color:var(--ink-soft);padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;flex-shrink:0}
-  .seg button[aria-pressed="true"]{background:var(--blue);color:#fff}
-  select{font:inherit;font-weight:500;font-size:14px;color:var(--ink);border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;flex:0 0 auto}
-  .time-controls{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
-  .time-controls::-webkit-scrollbar{display:none}
-  .time-controls button{border:1px solid var(--line);background:var(--card);font:inherit;font-size:13.5px;font-weight:500;color:var(--ink-soft);padding:6px 13px;border-radius:999px;cursor:pointer;white-space:nowrap;flex-shrink:0}
-  .time-controls button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
-  .days{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
-  .days::-webkit-scrollbar{display:none}
-  .days button{border:1px solid var(--line);background:var(--card);font:inherit;font-size:13.5px;font-weight:500;color:var(--ink-soft);padding:6px 13px;border-radius:999px;cursor:pointer;white-space:nowrap;flex-shrink:0}
-  .days button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
-  .hero{margin:16px 0 6px;background:var(--blue);color:#fff;border-radius:var(--radius);padding:18px 18px 16px;cursor:pointer;border:0;text-align:left;width:100%;font:inherit;display:block;position:relative;overflow:hidden}
-  .hero .eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#bfdbfe}
-  .hero .name{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:6px 0 4px;line-height:1.2;display:block}
-  .hero .meta{font-size:14px;color:#dbeafe}
-  .hero .when{position:absolute;right:16px;top:16px;background:var(--amber);color:#78350f;font-weight:700;font-size:13px;padding:5px 11px;border-radius:999px}
-  .notices{margin:8px 0 4px;padding:10px;background:#fef3c7;border-radius:var(--radius);border-left:4px solid var(--amber);font-size:13px;color:#92400e;line-height:1.5}
-  .notices strong{display:block;margin-bottom:3px}
-  .list{padding:10px 0 40px}
-  .count{font-size:13px;color:var(--ink-soft);margin:10px 2px 8px}
-  .mtg{display:flex;gap:14px;width:100%;text-align:left;font:inherit;border:1px solid var(--line);background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:8px;cursor:pointer;align-items:flex-start;position:relative}
-  .mtg.community::before{content:"✓";position:absolute;top:10px;right:10px;font-size:16px;color:var(--blue);font-weight:700}
-  .mtg:focus-visible,.hero:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-  .t{flex:0 0 62px;font-variant-numeric:tabular-nums}
-  .t .hh{font-weight:700;font-size:16px}
-  .t .dd{font-size:12px;color:var(--ink-soft);margin-top:1px}
-  .m .nm{font-family:'Fraunces',serif;font-weight:600;font-size:16.5px;line-height:1.25;display:block}
-  .m .ad{font-size:13.5px;color:var(--ink-soft);margin-top:3px;display:block}
-  .m .tags{margin-top:6px;display:flex;gap:5px;flex-wrap:wrap}
-  .pill{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#dbeafe;color:#1e3a8a}
-  .pill.dist{background:#fef3c7;color:#92400e}
-  .pill.online{background:#ddd6fe;color:#4f46e5}
-  .pill.community{background:#dbeafe;color:#1e3a8a}
-  .state{padding:36px 8px;text-align:center;color:var(--ink-soft);font-size:14.5px;line-height:1.55}
-  .state strong{color:var(--ink)}
-  .state .retry{margin-top:14px;border:0;background:var(--blue);color:#fff;font:inherit;font-weight:700;padding:10px 22px;border-radius:999px;cursor:pointer}
-  .skel{height:74px;border-radius:var(--radius);margin-bottom:8px;background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:sh 1.2s infinite}
-  @keyframes sh{to{background-position:-200% 0}}
-  @media (prefers-reduced-motion:reduce){.skel{animation:none}}
-  .ovl{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40;display:flex;align-items:flex-end;justify-content:center}
-  .sheet{background:var(--card);width:100%;max-width:720px;border-radius:18px 18px 0 0;max-height:88vh;overflow-y:auto;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
-  .sheet .top{position:sticky;top:0;background:var(--card);padding:16px 18px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-  .sheet h2{font-family:'Fraunces',serif;font-weight:600;font-size:21px;line-height:1.25}
-  .sheet .x{border:0;background:#f3f4f6;border-radius:999px;width:34px;height:34px;font-size:17px;cursor:pointer;color:var(--ink-soft);flex:0 0 auto;align-self:center}
-  .sheet .bd{padding:14px 18px}
-  .kv{margin-bottom:14px}
-  .kv .k{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:3px}
-  .kv .v{font-size:15.5px;line-height:1.45}
-  .kv a{color:var(--blue);font-weight:700;text-decoration:none}
-  .btns{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
-  .btns a{flex:1;min-width:120px;text-align:center;font-weight:700;font-size:14.5px;text-decoration:none;padding:12px;border-radius:11px}
-  .btns .g{background:var(--blue);color:#fff}
-  .btns .a{background:#f3f4f6;color:var(--ink)}
-  .submit-btn{width:100%;border:0;background:var(--amber);color:#78350f;font:inherit;font-weight:700;padding:12px;border-radius:11px;cursor:pointer;margin-top:8px}
-  .src{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-soft);line-height:1.5}
-  .src a{color:var(--blue)}
-  footer{padding:8px 16px 28px;text-align:center;font-size:12.5px;color:var(--ink-soft);line-height:1.6}
-  footer a{color:var(--blue)}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Karla',system-ui,sans-serif;background:#f9fafb;color:#1f2937}
+  header{background:#1e3a8a;color:#fff;padding:20px;padding-top:calc(20px + env(safe-area-inset-top))}
+  header h1{font-size:28px;margin-bottom:4px}
+  header p{font-size:13px;color:#dbeafe}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  .controls{position:sticky;top:0;background:#f9fafb;padding:12px 16px;border-bottom:1px solid #e5e7eb;z-index:10}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  select{padding:8px;font:inherit;border:1px solid #e5e7eb;border-radius:8px;flex:0 0 auto}
+  .seg{display:flex;gap:0;background:#e0e7ff;border-radius:999px;padding:3px;overflow-x:auto;max-width:100%}
+  .seg button{border:0;background:0;font:inherit;font-weight:700;font-size:13px;color:#6b7280;padding:6px 12px;border-radius:999px;white-space:nowrap;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:#1e3a8a;color:#fff}
+  .days,.times{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px}
+  .days button,.times button{border:1px solid #e5e7eb;background:#fff;font:inherit;font-size:13px;font-weight:500;padding:6px 13px;border-radius:999px;white-space:nowrap;cursor:pointer}
+  .days button[aria-pressed="true"],.times button[aria-pressed="true"]{background:#1f2937;border-color:#1f2937;color:#fff}
+  main{padding:0}
+  .state{padding:40px 20px;text-align:center;color:#6b7280;font-size:15px;line-height:1.6}
+  .state strong{color:#1f2937}
+  .mtg{border:1px solid #e5e7eb;background:#fff;padding:14px;margin:8px 16px;border-radius:12px;cursor:pointer;display:flex;gap:12px}
+  .mtg .time{font-size:16px;font-weight:700;min-width:50px}
+  .mtg .info strong{display:block;font-family:'Fraunces',serif;font-size:16px;margin-bottom:4px}
+  .mtg .info small{font-size:13px;color:#6b7280;display:block;margin-top:4px}
+  .skel{height:60px;margin:8px 16px;background:#e5e7eb;border-radius:12px;animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:flex;align-items:flex-end}
+  .sheet.hidden{display:none}
+  .sheet-content{background:#fff;width:100%;border-radius:16px 16px 0 0;padding:20px;padding-bottom:calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto}
+  .sheet-content h2{font-family:'Fraunces',serif;font-size:20px;margin-bottom:16px}
+  .sheet-content .close{position:absolute;top:16px;right:16px;border:0;background:#f3f4f6;border-radius:999px;width:34px;height:34px;font-size:20px;cursor:pointer}
+  .kv{margin-bottom:16px}
+  .kv .k{font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px}
+  .kv .v{font-size:15px;line-height:1.5}
+  .kv a{color:#1e3a8a;font-weight:700;text-decoration:none}
+  footer{padding:20px;text-align:center;font-size:12px;color:#6b7280;line-height:1.6}
+  footer a{color:#1e3a8a}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
     <h1>We Do Recover</h1>
-    <p>All pathways welcome · find the next meeting near you · free · no account</p>
+    <p>All pathways welcome · find the next meeting near you</p>
   </div>
 </header>
+
 <div class="controls">
   <div class="wrap">
     <div class="row">
-      <select id="radius" aria-label="Search radius">
+      <select id="radius">
         <option value="5">5 mi</option>
-        <option value="10">10 mi</option>
         <option value="25" selected>25 mi</option>
         <option value="50">50 mi</option>
       </select>
     </div>
-    <div class="seg" id="fellowship-row" role="group" aria-label="Fellowship"></div>
-    <div class="days" id="days" role="group" aria-label="Day of week"></div>
-    <div class="time-controls" id="times" role="group" aria-label="Time of day"></div>
+    <div class="seg" id="fellowships" role="group"></div>
+    <div class="days" id="days" role="group"></div>
+    <div class="times" id="times" role="group"></div>
   </div>
 </div>
-<main class="wrap">
-  <div id="hero"></div>
-  <div id="notices"></div>
-  <div class="list" id="list"></div>
-</main>
+
+<main id="main"></main>
+
 <footer>
-  Data comes live from official AA and NA directories, SMART, Refuge Recovery, Women for Sobriety, S.O.S., LifeRing, She Recovers, and Celebrate Recovery — plus community submissions (moderated). 
-  <a href="#submit" id="submit-link">Submit or update a meeting</a>. Always confirm directly with the source — schedules change.
+  Data from NA BMLT + community submissions. <a href="#" id="submit-btn">Submit a meeting</a>. Always confirm directly with the source — schedules change.
 </footer>
-<div id="sheetRoot"></div>
+
+<div class="sheet hidden" id="sheet">
+  <div class="sheet-content">
+    <button class="close" onclick="closeSheet()">✕</button>
+    <div id="sheet-body"></div>
+  </div>
+</div>
+
 <script>
-const $ = (s) => document.querySelector(s);
-const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-const DAYS_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-const FELLOWSHIPS = {AA:{label:"AA",full:"Alcoholics Anonymous"},NA:{label:"NA",full:"Narcotics Anonymous"},SMART:{label:"SMART",full:"SMART Recovery"},RR:{label:"Refuge",full:"Refuge Recovery"},WFS:{label:"WFS",full:"Women for Sobriety"},SOS:{label:"S.O.S.",full:"Secular Organizations for Sobriety"},LR:{label:"LifeRing",full:"LifeRing Secular Recovery"},SR:{label:"She Recovers",full:"She Recovers"},CR:{label:"Celebrate",full:"Celebrate Recovery"}};
+const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const FELLOWSHIPS = {NA:"Narcotics Anonymous", AA:"AA", SMART:"SMART Recovery", RR:"Refuge Recovery", WFS:"WFS", SOS:"SOS", LR:"LifeRing", SR:"She Recovers", CR:"Celebrate"};
 
-const state = {fellowship:"NA",radius:25,day:new Date().getDay(),timeFilter:"all",loc:null,meetings:[],notices:[],loading:true,error:null};
+const state = {fellowship:"NA", radius:25, day:new Date().getDay(), timeFilter:"all", loc:null, meetings:[], loading:false};
 
-function renderFellowships(){const btns=Object.entries(FELLOWSHIPS).map(([k,v])=>`<button data-f="${k}" aria-pressed="${k===state.fellowship}" title="${v.full}">${v.label}</button>`).join("");$("#fellowship-row").innerHTML=btns;$("#fellowship-row").querySelectorAll("button").forEach(b=>{b.onclick=()=>{state.fellowship=b.dataset.f;renderFellowships();load()}});}
-function renderDays(){const today=new Date().getDay();$("#days").innerHTML=[0,1,2,3,4,5,6].map(i=>{const d=(today+i)%7;const label=i===0?"Today":i===1?"Tomorrow":DAYS_SHORT[d];return`<button data-day="${d}" aria-pressed="${d===state.day}">${label}</button>`}).join("");$("#days").querySelectorAll("button").forEach(b=>{b.onclick=()=>{state.day=+b.dataset.day;renderDays();load()}});}
-function renderTimes(){$("#times").innerHTML=['<button data-time="all" aria-pressed="true">All times</button>','<button data-time="morning">Morning (5-11am)</button>','<button data-time="afternoon">Afternoon (11am-5pm)</button>','<button data-time="evening">Evening (5pm+)</button>'].join("");$("#times").querySelectorAll("button").forEach(b=>{b.onclick=()=>{state.timeFilter=b.dataset.time;renderTimes();render()}});}
-function fmtTime(t){if(!t)return"";const[h,m]=t.split(":").map(Number);if(isNaN(h))return t;const ap=h>=12?"PM":"AM";return`${((h+11)%12)+1}:${String(m).padStart(2,"0")} ${ap}`}
-function minutesUntil(m){const now=new Date();const[h,mi]=(m.time||"").split(":").map(Number);if(isNaN(h)||isNaN(mi))return 9999;let dd=(m.day-now.getDay()+7)%7;let mins=dd*1440+(h*60+mi)-(now.getHours()*60+now.getMinutes());if(mins<0)mins+=7*1440;return mins}
-function untilLabel(mins){if(mins<60)return`in ${mins} min`;if(mins<1440)return`in ${Math.round(mins/60)} hr`;return`in ${Math.round(mins/1440)} d`}
-function matchesTimeFilter(timeStr){if(state.timeFilter==="all")return true;const[h]=timeStr.split(":").map(Number);if(state.timeFilter==="morning")return h>=5&&h<12;if(state.timeFilter==="afternoon")return h>=12&&h<17;if(state.timeFilter==="evening")return h>=17;return true}
-const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
-async function load(){state.loading=true;state.error=null;state.meetings=[];state.notices=[];render();try{const la=state.loc.lat.toFixed(2),ln=state.loc.lng.toFixed(2);const cfgR=await fetch(`/api/meetings?fellowship=${state.fellowship}&lat=${la}&lng=${ln}&radius=${state.radius}`);const cfg=await cfgR.json();if(!cfgR.ok)throw new Error(cfg.error||"Request failed");state.full_name=cfg.full_name;state.official_finder=cfg.official_finder;const meetings=[];function miles(a,b,c,d){const R=3958.8,dLat=((c-a)*Math.PI)/180,dLon=((d-b)*Math.PI)/180,x=Math.sin(dLat/2)**2+Math.cos((a*Math.PI)/180)*Math.cos((c*Math.PI)/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))};if(cfg.bmlt_url){try{const r=await fetch(cfg.bmlt_url);if(r.ok){const rows=await r.json();if(Array.isArray(rows)){rows.filter(m=>m.latitude&&m.longitude&&m.meeting_name).forEach(m=>{const la=+m.latitude,ln=+m.longitude;meetings.push({fellowship:"NA",name:(m.meeting_name||"").trim(),day:(parseInt(m.weekday_tinyint,10)-1+7)%7,time:(m.start_time||"").slice(0,5),venue:m.location_text||"",address:[m.location_street,m.location_municipality,m.location_province].filter(Boolean).join(", "),city:m.location_municipality||"",lat:la,lng:ln,distance:+miles(state.loc.lat,state.loc.lng,la,ln).toFixed(1),formats:m.formats?m.formats.split(","):[],notes:m.comments||"",online_url:m.virtual_meeting_link||"",source:"BMLT worldwide",source_url:"https://bmlt.app",community:false})})}}}catch(e){}}if(cfg.supabase_url){try{const r=await fetch(cfg.supabase_url,{headers:{apikey:cfg.supabase_key}});if(r.ok){const rows=await r.json();if(Array.isArray(rows)){rows.filter(m=>m.status==="approved").forEach(m=>{const has=m.lat!=null&&m.lng!=null;const d=has?+miles(state.loc.lat,state.loc.lng,m.lat,m.lng).toFixed(1):null;if(!d||d<=cfg.radius_miles){meetings.push({fellowship:state.fellowship,name:m.meeting_name,day:m.day,time:m.time||"",venue:m.venue||"",address:m.address||"",city:m.city||"",lat:m.lat,lng:m.lng,distance:d,formats:[],notes:m.details||"",online_url:m.online_url||"",source:"Community",source_url:"",community:true})}}})}}}catch(e){}}state.meetings=meetings.filter(m=>!m.distance||m.distance<=cfg.radius_miles).sort((a,b)=>(a.distance??9999)-(b.distance??9999))}catch(e){state.error=e.message||String(e)}state.loading=false;render()}
+function renderUI(){
+  // Fellowships
+  document.getElementById("fellowships").innerHTML = Object.keys(FELLOWSHIPS).map(k => 
+    `<button data-f="${k}" aria-pressed="${k===state.fellowship}">${k}</button>`
+  ).join("");
+  document.getElementById("fellowships").querySelectorAll("button").forEach(b => {
+    b.onclick = () => {state.fellowship = b.dataset.f; renderUI(); load()}
+  });
 
-function locate(){if(!navigator.geolocation){state.error="Location isn't available in this browser.";state.loading=false;render();return}navigator.geolocation.getCurrentPosition(p=>{state.loc={lat:p.coords.latitude,lng:p.coords.longitude};load()},()=>{state.error="We need your location to find nearby meetings. Allow location access and try again.";state.loading=false;render()},{enableHighAccuracy:true,timeout:10000,maximumAge:0})}
+  // Days
+  const today = new Date().getDay();
+  document.getElementById("days").innerHTML = [0,1,2,3,4,5,6].map((i) => {
+    const d = (today + i) % 7;
+    const label = i===0 ? "Today" : i===1 ? "Tomorrow" : DAYS[d];
+    return `<button data-day="${d}" aria-pressed="${d===state.day}">${label}</button>`;
+  }).join("");
+  document.getElementById("days").querySelectorAll("button").forEach(b => {
+    b.onclick = () => {state.day = +b.dataset.day; renderUI(); load()}
+  });
 
-function render(){const heroEl=$("#hero"),listEl=$("#list"),notEl=$("#notices");if(state.loading){heroEl.innerHTML="";notEl.innerHTML="";listEl.innerHTML=`<div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>`;return}if(state.error){heroEl.innerHTML="";notEl.innerHTML="";listEl.innerHTML=`<div class="state"><strong>Couldn't load meetings.</strong><br>${esc(state.error)}<br><a href="${esc(state.official_finder||'#')}" rel="noopener" style="color:var(--blue)">Try the official finder</a><br><button class="retry" id="retryBtn">Try again</button></div>`;$("#retryBtn").onclick=()=>state.loc?load():locate();return}
+  // Times
+  document.getElementById("times").innerHTML = [
+    ['all','All times'],
+    ['morning','Morning'],
+    ['afternoon','Afternoon'],
+    ['evening','Evening']
+  ].map(([v,l]) => `<button data-time="${v}" aria-pressed="${v===state.timeFilter}">${l}</button>`).join("");
+  document.getElementById("times").querySelectorAll("button").forEach(b => {
+    b.onclick = () => {state.timeFilter = b.dataset.time; renderUI(); render()}
+  });
 
-const soonest=[...state.meetings].sort((a,b)=>minutesUntil(a)-minutesUntil(b))[0];heroEl.innerHTML=soonest?`<button class="hero" data-i="${state.meetings.indexOf(soonest)}"><span class="eyebrow">Next recovery meeting</span><span class="when">${untilLabel(minutesUntil(soonest))}</span><span class="name">${esc(soonest.name)}</span><span class="meta">${DAYS[soonest.day]} ${fmtTime(soonest.time)} · ${soonest.distance} mi · ${esc(soonest.city||soonest.venue)}</span></button>`:"";
+  document.getElementById("radius").onchange = (e) => {state.radius = +e.target.value; load()};
+}
 
-notEl.innerHTML=state.notices.slice(0,3).map(n=>{let msg="";if(n.kind==="temporary")msg=`⏰ Temporary: <strong>${esc(n.meeting_name)}</strong> — ${esc(n.details||"meeting details changing")}`;else if(n.kind==="change")msg=`📝 Changed: <strong>${esc(n.meeting_name)}</strong> — ${esc(n.details||"meeting details changed")}`;else if(n.kind==="remove")msg=`⛔ Removed: <strong>${esc(n.meeting_name)}</strong> — ${esc(n.details||"no longer listed")}`;return`<div class="notices">${msg}</div>`}).join("");
+async function load(){
+  state.loading = true;
+  render();
+  
+  if (!state.loc) return;
+  
+  try {
+    const lat = state.loc.lat.toFixed(2);
+    const lng = state.loc.lng.toFixed(2);
+    
+    if (state.fellowship === "NA") {
+      const res = await fetch(`https://aggregator.bmltenabled.org/main_server/client_interface/json/?switcher=GetSearchResults&lat_val=${lat}&long_val=${lng}&geo_width=${state.radius}`);
+      const data = await res.json();
+      
+      if (Array.isArray(data)) {
+        state.meetings = data.filter(m => m.latitude && m.longitude && m.meeting_name).map(m => {
+          const d = Math.sqrt((m.latitude-lat)**2 + (m.longitude-lng)**2) * 69;
+          return {
+            name: m.meeting_name, day: (parseInt(m.weekday_tinyint) - 1 + 7) % 7,
+            time: (m.start_time || "").slice(0,5), venue: m.location_text,
+            city: m.location_municipality, distance: d.toFixed(1)
+          };
+        });
+      }
+    } else {
+      // Fetch community submissions for this fellowship
+      const res = await fetch(`https://qdxufynzilmqzhortyrq.supabase.co/rest/v1/approved_meetings?fellowship=eq.${state.fellowship}&status=eq.approved`, {
+        headers: {apikey: "sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39"}
+      });
+      if (res.ok) {
+        const data = await res.json();
+        state.meetings = Array.isArray(data) ? data.map(m => ({
+          name: m.meeting_name, day: m.day, time: m.time || "", venue: m.venue, city: m.city, distance: 0, community: true
+        })) : [];
+      }
+    }
+  } catch(e) {
+    console.error(e);
+  }
+  
+  state.loading = false;
+  render();
+}
 
-const dayList=state.meetings.filter(m=>m.day===state.day&&matchesTimeFilter(m.time||"")).sort((a,b)=>(a.time||"").localeCompare(b.time||"")||(a.distance||9999)-(b.distance||9999));
+function render(){
+  const main = document.getElementById("main");
+  
+  if (state.loading) {
+    main.innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+    return;
+  }
+  
+  const filtered = state.meetings.filter(m => m.day === state.day && (state.timeFilter==="all" || matchTime(m.time, state.timeFilter)));
+  
+  if (filtered.length === 0) {
+    main.innerHTML = `<div class="state">No meetings found for <strong>${DAYS[state.day]}</strong> within ${state.radius} miles.<br>Try another day or widen the radius.</div>`;
+    return;
+  }
+  
+  main.innerHTML = filtered.map(m => `
+    <div class="mtg" onclick="openSheet(${JSON.stringify(m).replace(/"/g,'&quot;')})">
+      <div class="time">${m.time || "TBA"}</div>
+      <div class="info">
+        <strong>${esc(m.name)}</strong>
+        <small>${esc(m.venue || m.city)}</small>
+        ${m.distance > 0 ? `<small>${esc(m.distance)} mi</small>` : ''}
+      </div>
+    </div>
+  `).join("");
+}
 
-if(dayList.length===0){listEl.innerHTML=`<div class="state">No meetings listed for <strong>${DAYS[state.day]}</strong> within ${state.radius} miles.<br>Try another day, time, or widen the radius.<br><a href="${esc(state.official_finder||'#')}" rel="noopener" style="color:var(--blue)">Check the official finder</a></div>`}else{const community=dayList.filter(m=>m.community).length;listEl.innerHTML=`<p class="count">${dayList.length} meeting${dayList.length===1?"":"s"} on ${DAYS[state.day]} · within ${state.radius} mi${community?` · ${community} from community`:""}</p>`+dayList.map(m=>`<button class="mtg ${m.community?'community':''}" data-i="${state.meetings.indexOf(m)}"><span class="t"><span class="hh">${fmtTime(m.time||"").replace(" ","<br>")||"TBA"}</span></span><span class="m"><span class="nm">${esc(m.name)}</span><span class="ad">${esc(m.venue?m.venue+" · ":"")}${esc(m.address||m.city)}</span><span class="tags">${m.distance!=null?`<span class="pill dist">${m.distance} mi</span>`:""}${m.online_url?'<span class="pill online">Online</span>':''}${m.community?'<span class="pill community">Community</span>':''}</span></span></button>`).join("")}
+function matchTime(t, filter){
+  if(filter==="all")return true;
+  const h = parseInt(t.split(":")[0]);
+  if(filter==="morning")return h >= 5 && h < 12;
+  if(filter==="afternoon")return h >= 12 && h < 17;
+  if(filter==="evening")return h >= 17;
+  return true;
+}
 
-document.querySelectorAll("[data-i]").forEach(b=>{b.onclick=()=>openSheet(state.meetings[+b.dataset.i])})}
+function openSheet(meeting){
+  document.getElementById("sheet-body").innerHTML = `
+    <h2>${esc(meeting.name)}</h2>
+    <div class="kv">
+      <div class="k">When</div>
+      <div class="v">${DAYS[meeting.day]}s at ${meeting.time || "TBA"}</div>
+    </div>
+    <div class="kv">
+      <div class="k">Where</div>
+      <div class="v">${esc(meeting.venue || meeting.city)}</div>
+    </div>
+  `;
+  document.getElementById("sheet").classList.remove("hidden");
+}
 
-function openSheet(m){const mapQ=encodeURIComponent(m.address||`${m.name}, ${m.city}`);const appleQ=encodeURIComponent(m.address||`${m.name}`);$("#sheetRoot").innerHTML=`<div class="ovl" id="ovl"><div class="sheet"><div class="top"><div><span class="pill">${esc(m.fellowship)} ${m.community?'· Community':''}</span><h2>${esc(m.name)}</h2></div><button class="x" aria-label="Close">✕</button></div><div class="bd"><div class="kv"><div class="k">When</div><div class="v">${DAYS[m.day]}s at ${fmtTime(m.time)||"Time TBA"}</div></div><div class="kv"><div class="k">Where</div><div class="v">${esc(m.venue?m.venue+" · ":"")}${esc(m.address||m.city)}<br><span style="color:var(--ink-soft);font-size:13.5px">${m.distance?m.distance+" miles from you":"Distance unknown"}</span></div></div>${m.online_url?`<div class="kv"><div class="k">Join online</div><div class="v"><a href="${esc(m.online_url)}" rel="noopener">Open meeting link</a></div></div>`:""}${m.notes?`<div class="kv"><div class="k">Notes</div><div class="v">${esc(m.notes)}</div></div>`:""}${m.formats&&m.formats.length?`<div class="kv"><div class="k">Formats</div><div class="v">${m.formats.join(", ")}</div></div>`:""}${!m.community?`<div class="btns"><a class="g" href="https://www.google.com/maps/search/${mapQ}" rel="noopener" target="_blank">Google Maps</a><a class="a" href="https://maps.apple.com/?q=${appleQ}" rel="noopener" target="_blank">Apple Maps</a></div>`:""}${!m.community?`<div class="src">Listing from <a href="${esc(m.source_url)}" rel="noopener" target="_blank">${esc(m.source)}</a><br>Schedules change — if this meeting matters to your day, confirm directly.</div>`:""}${m.community?`<div class="src"><strong>Community submission</strong> · reviewed and approved by volunteers</div>`:""}</div></div></div>`;const close=()=>{$("#sheetRoot").innerHTML=""};$("#ovl").onclick=e=>{if(e.target.id==="ovl")close()};$(".x").onclick=close;document.addEventListener("keydown",function esc_(e){if(e.key==="Escape"){close();document.removeEventListener("keydown",esc_)}})}
+function closeSheet(){
+  document.getElementById("sheet").classList.add("hidden");
+}
 
-$("#radius").onchange=e=>{state.radius=+e.target.value;load()};
-$("#submit-link").onclick=()=>{$("#sheetRoot").innerHTML=`<div class="ovl" id="ovl"><div class="sheet"><div class="top"><h2>Submit or update a meeting</h2><button class="x" aria-label="Close">✕</button></div><div class="bd"><p style="font-size:14px;color:var(--ink-soft);margin-bottom:16px">Help keep this directory current. All submissions are reviewed within 24 hours and completely anonymous.</p><form id="submitForm"><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">What are you submitting? *</div><select name="kind" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" required><option value="new">New meeting</option><option value="change">Change to existing meeting</option><option value="remove">Meeting no longer meets</option><option value="temporary">Short-notice update (expires)</option></select></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Fellowship *</div><select name="fellowship" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" required>${Object.entries(FELLOWSHIPS).map(([k,v])=>`<option value="${k}" ${k===state.fellowship?'selected':''}>${v.full}</option>`).join("")}</select></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Meeting name *</div><input type="text" name="meeting_name" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" placeholder="e.g., Fresh Start Morning Group" required /></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Venue (location name)</div><input type="text" name="venue" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" placeholder="e.g., Community Center, Church basement" /></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Street address</div><input type="text" name="address" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" placeholder="e.g., 123 Main St" /></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">City</div><input type="text" name="city" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" placeholder="e.g., Springfield" /></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Day of week *</div><select name="day" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" required><option value="">Select a day</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Time (HH:MM)</div><input type="time" name="time" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" /></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Online URL (if hybrid/online)</div><input type="url" name="online_url" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" placeholder="https://zoom.us/..." /></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Details or what changed *</div><textarea name="details" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;min-height:60px" placeholder="Describe the meeting or the change." required></textarea></label><button type="submit" style="width:100%;background:var(--blue);color:#fff;border:0;font-weight:700;padding:12px;border-radius:8px;cursor:pointer;font:inherit;margin-bottom:8px">Submit for review</button></form><p style="font-size:11px;color:var(--ink-soft);line-height:1.5">✓ Reviewed within 24 hours<br>✓ Your location is never shared<br>✓ Completely anonymous</p></div></div></div>`;$("#submitForm").onsubmit=async(e)=>{e.preventDefault();const fd=new FormData($("#submitForm"));const d=Object.fromEntries(fd);d.day=parseInt(d.day,10);d.lat=state.loc?.lat;d.lng=state.loc?.lng;try{const r=await fetch("https://qdxufynzilmqzhortyrq.supabase.co/rest/v1/submissions",{method:"POST",headers:{"Content-Type":"application/json","apikey":"sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39","Authorization":"Bearer sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39"},body:JSON.stringify(d)});if(r.ok){$("#sheetRoot").innerHTML=`<div class="ovl" id="ovl"><div class="sheet"><div class="bd" style="text-align:center;padding:60px 20px"><h2 style="margin-bottom:12px">Thank you ✓</h2><p style="color:var(--ink-soft);margin-bottom:20px">Your submission has been received. It will be reviewed within 24 hours and appear in the app if approved.</p><button class="submit-btn" onclick="document.getElementById('ovl').parentElement.innerHTML=''">Close</button></div></div></div>`}else{alert("Error submitting. Please try again.")}}catch(err){alert("Error: "+err.message)}};$(".x").onclick=()=>{$("#sheetRoot").innerHTML=""};$("#ovl").onclick=e=>{if(e.target.id==="ovl")$("#sheetRoot").innerHTML=""}};
+document.getElementById("sheet").onclick = (e) => {
+  if(e.target.id === "sheet") closeSheet();
+};
 
-renderFellowships();renderDays();renderTimes();locate();
+document.getElementById("submit-btn").onclick = (e) => {
+  e.preventDefault();
+  alert("Submit feature coming soon. Email: we-do-recover.app@example.com");
+};
+
+function locate(){
+  navigator.geolocation.getCurrentPosition(p => {
+    state.loc = {lat: p.coords.latitude, lng: p.coords.longitude};
+    load();
+  }, () => {
+    document.getElementById("main").innerHTML = `<div class="state">Please allow location access to find nearby meetings.</div>`;
+  });
+}
+
+renderUI();
+locate();
 </script>
 </body>
 </html>
