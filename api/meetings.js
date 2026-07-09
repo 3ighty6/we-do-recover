@@ -77,9 +77,9 @@ export default async function handler(req, res) {
   }
 
   async function getAA(lat, lng, radius) {
-    // AA TSML fetching moved to CLIENT-SIDE (browser can fetch, server cannot)
-    // This endpoint now returns the intergroup data for the client to fetch
-    return { meetings: [], src: { name: "AA Meetings (client-side)", homepage: "https://www.aa.org/find-aa" }, aa_sources: AA_SOURCES };
+    // AA TSML feeds block all non-browser requests (anti-bot protection)
+    // Strategy: Community submissions + official finder is more sustainable
+    return { meetings: [], src: { name: "AA Meetings (use official finder or submit locally)", homepage: "https://www.aa.org/find-aa" } };
   }
 
   async function getCommunity(fellowship, lat, lng, radius) {
