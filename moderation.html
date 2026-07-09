@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>We Do Recover — Moderation Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Karla', system-ui, sans-serif; background: #f9fafb; color: #1f2937; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 20px; }
+  header { background: #1e3a8a; color: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+  h1 { font-size: 28px; margin-bottom: 4px; }
+  h2 { font-size: 20px; margin: 20px 0 12px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  th { background: #f3f4f6; padding: 12px; text-align: left; font-weight: 700; font-size: 14px; }
+  td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
+  tr:last-child td { border-bottom: 0; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: 700; }
+  .badge.pending { background: #fef3c7; color: #92400e; }
+  .badge.approved { background: #dcfce7; color: #15803d; }
+  .badge.rejected { background: #fee2e2; color: #7f1d1d; }
+  .btn { border: 0; padding: 8px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px; }
+  .btn.approve { background: #10b981; color: #fff; }
+  .btn.reject { background: #ef4444; color: #fff; }
+  .btn:hover { opacity: 0.9; }
+  .details { font-size: 13px; color: #6b7280; }
+  .filter { margin-bottom: 16px; }
+  .filter button { border: 1px solid #d1d5db; background: #fff; padding: 8px 14px; border-radius: 6px; cursor: pointer; margin-right: 8px; }
+  .filter button.active { background: #1e3a8a; color: #fff; border-color: #1e3a8a; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat { background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .stat .num { font-size: 24px; font-weight: 700; color: #1e3a8a; }
+  .stat .lbl { font-size: 13px; color: #6b7280; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>We Do Recover — Moderation</h1>
+    <p>Review and approve community meeting submissions (read-only for demo)</p>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="filter">
+    <button class="active" data-status="pending">Pending</button>
+    <button data-status="approved">Approved</button>
+    <button data-status="rejected">Rejected</button>
+  </div>
+
+  <table id="table">
+    <thead>
+      <tr>
+        <th>Fellowship</th>
+        <th>Meeting Name</th>
+        <th>Day / Time</th>
+        <th>Location</th>
+        <th>Details</th>
+        <th>Status</th>
+        <th>Submitted</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+  const SUPA = "https://qdxufynzilmqzhortyrq.supabase.co";
+  const SUPA_KEY = "sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39";
+  const FELLOWSHIPS = { AA: "AA", NA: "NA", SMART: "SMART", RR: "Refuge", WFS: "WFS", SOS: "SOS", LR: "LifeRing", SR: "She Recovers", CR: "Celebrate" };
+  const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  let allRows = [];
+  let filterStatus = "pending";
+
+  async function load() {
+    try {
+      const url = `${SUPA}/rest/v1/submissions?order=created_at.desc&limit=100`;
+      const r = await fetch(url, { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` } });
+      allRows = await r.json();
+      render();
+      updateStats();
+    } catch (e) {
+      console.error(e);
+      document.getElementById("tbody").innerHTML = `<tr><td colspan="8" style="text-align: center; color: #6b7280;">Error loading submissions</td></tr>`;
+    }
+  }
+
+  function updateStats() {
+    const pending = allRows.filter(r => r.status === "pending").length;
+    const approved = allRows.filter(r => r.status === "approved").length;
+    const rejected = allRows.filter(r => r.status === "rejected").length;
+    document.getElementById("stats").innerHTML = `
+      <div class="stat"><div class="num">${pending}</div><div class="lbl">Pending review</div></div>
+      <div class="stat"><div class="num">${approved}</div><div class="lbl">Approved</div></div>
+      <div class="stat"><div class="num">${rejected}</div><div class="lbl">Rejected</div></div>
+    `;
+  }
+
+  function render() {
+    const filtered = allRows.filter(r => r.status === filterStatus);
+    const html = filtered.map(r => `
+      <tr>
+        <td>${FELLOWSHIPS[r.fellowship] || r.fellowship}</td>
+        <td><strong>${r.meeting_name}</strong><br><span class="details">${r.kind === "new" ? "New meeting" : r.kind === "change" ? "Change" : r.kind === "remove" ? "Removal" : "Temporary"}</span></td>
+        <td>${r.day != null ? DAYS[r.day] + (r.time ? ` ${r.time}` : "") : "—"}</td>
+        <td>${r.venue ? r.venue + "<br>" : ""}${r.address || r.city || "—"}</td>
+        <td><span class="details">${r.details || "—"}</span></td>
+        <td><span class="badge ${r.status}">${r.status}</span></td>
+        <td><span class="details">${new Date(r.created_at).toLocaleDateString()}</span></td>
+        <td>${filterStatus === "pending" ? `<button class="btn approve" onclick="approve('${r.id}')">✓ Approve</button> <button class="btn reject" onclick="reject('${r.id}')">✕ Reject</button>` : "—"}</td>
+      </tr>
+    `).join("");
+    document.getElementById("tbody").innerHTML = html || `<tr><td colspan="8" style="text-align: center; color: #6b7280;">No submissions</td></tr>`;
+  }
+
+  async function approve(id) {
+    const r = await fetch(`${SUPA}/rest/v1/submissions?id=eq.${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` },
+      body: JSON.stringify({ status: "approved", reviewed_at: new Date().toISOString() })
+    });
+    if (r.ok) { load(); } else { alert("Error approving"); }
+  }
+
+  async function reject(id) {
+    if (!confirm("Reject this submission?")) return;
+    const r = await fetch(`${SUPA}/rest/v1/submissions?id=eq.${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` },
+      body: JSON.stringify({ status: "rejected", reviewed_at: new Date().toISOString() })
+    });
+    if (r.ok) { load(); } else { alert("Error rejecting"); }
+  }
+
+  document.querySelectorAll(".filter button").forEach(b => {
+    b.onclick = () => {
+      document.querySelectorAll(".filter button").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      filterStatus = b.dataset.status;
+      render();
+    };
+  });
+
+  load();
+</script>
+</body>
+</html>
