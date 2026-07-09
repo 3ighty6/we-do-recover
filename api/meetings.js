@@ -2,20 +2,11 @@ export default async function handler(req, res) {
   const SUPA = "https://qdxufynzilmqzhortyrq.supabase.co";
   const SUPA_KEY = "sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39";
 
-  // AA TSML Intergroups by region (adds ~10 major US regions)
+  // AA TSML Intergroups - ONLY verified working feeds (NYC + SF/Marin)
+  // Regional expansion requires verifying each intergroup's TSML endpoint
   const AA_SOURCES = {
     nyc: { name: "New York Inter-Group", url: "https://www.nyintergroup.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.nyintergroup.org", center: { lat: 40.7128, lng: -74.0060 } },
     sfbay: { name: "AA San Francisco & Marin", url: "https://aasfmarin.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://aasfmarin.org", center: { lat: 37.7749, lng: -122.4194 } },
-    la: { name: "AA Los Angeles", url: "https://www.aalosangeles.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aalosangeles.org", center: { lat: 34.0522, lng: -118.2437 } },
-    chicago: { name: "AA Chicago", url: "https://www.aachicago.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aachicago.org", center: { lat: 41.8781, lng: -87.6298 } },
-    dc: { name: "AA DC Area", url: "https://www.aadcarea.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aadcarea.org", center: { lat: 38.9072, lng: -77.0369 } },
-    boston: { name: "AA Boston", url: "https://www.aaboston.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aaboston.org", center: { lat: 42.3601, lng: -71.0589 } },
-    philly: { name: "AA Philadelphia", url: "https://www.aaphilly.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aaphilly.org", center: { lat: 39.9526, lng: -75.1652 } },
-    denver: { name: "AA Denver", url: "https://www.aadenver.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aadenver.org", center: { lat: 39.7392, lng: -104.9903 } },
-    seattle: { name: "AA Seattle", url: "https://www.aaseattle.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aaseattle.org", center: { lat: 47.6062, lng: -122.3321 } },
-    austin: { name: "AA Austin", url: "https://www.aaaustin.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aaaustin.org", center: { lat: 30.2672, lng: -97.7431 } },
-    miami: { name: "AA Miami", url: "https://www.aamillington.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aamillington.org", center: { lat: 25.7617, lng: -80.1918 } },
-    atlanta: { name: "AA Atlanta", url: "https://www.aaatl.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aaatl.org", center: { lat: 33.7490, lng: -84.3880 } },
   };
   const BMLT = "https://aggregator.bmltenabled.org/main_server/client_interface/json/";
 
@@ -95,8 +86,7 @@ export default async function handler(req, res) {
           .filter(m => m.distance <= radius);
       }
     } catch (err) {
-      // If this intergroup fails, try next nearest (optional fallback)
-      console.error(`AA feed ${src.name} failed: ${err.message}`);
+      // Silently fail - community submissions + official finder will handle it
     }
     
     return { meetings, src };
@@ -164,7 +154,7 @@ export default async function handler(req, res) {
   if (F.live === "bmlt") tasks.push(getNA(la, ln, rad).then(m => { out.meetings.push(...m); out.source = { name: "BMLT worldwide directory", homepage: "https://bmlt.app" }; }));
   if (F.live === "tsml") tasks.push(getAA(la, ln, rad).then(r => { out.meetings.push(...r.meetings); out.source = { name: r.src.name, homepage: r.src.homepage }; }));
   tasks.push(getCommunity(fellowship, la, ln, rad).then(m => out.meetings.push(...m)));
-  tasks.push(getNotices(fellowship, la, ln, rad).then(n => { out.notices = n; }));
+  tasks.push(getNotices(fellowship, la, lng, rad).then(n => { out.notices = n; }));
 
   try {
     await Promise.all(tasks);
