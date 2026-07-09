@@ -124,6 +124,7 @@ function renderUI(){
 
 async function load(){
   state.loading = true;
+  state.meetings = []; // Clear old meetings immediately
   render();
   
   if (!state.loc) return;
