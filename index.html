@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#17291F" />
+<meta name="theme-color" content="#1e3a8a" />
 <meta name="description" content="We Do Recover: find the next meeting near you. AA, NA, SMART, Refuge Recovery, Women for Sobriety, S.O.S., LifeRing, She Recovers, Celebrate Recovery. Free, no account, all pathways welcome." />
 <title>We Do Recover — meeting finder</title>
 <link rel="manifest" href="/manifest.json" />
@@ -11,128 +11,88 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Karla:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
-  :root{
-    --paper:#F2F5F1; --card:#FFFFFF; --ink:#17291F; --ink-soft:#4B5D53;
-    --pine:#2E6B4F; --pine-deep:#1E4A36; --amber:#DE9A4A; --line:#DCE3DC;
-    --radius:14px;
-  }
+  :root{--paper:#f9fafb;--card:#ffffff;--ink:#1f2937;--ink-soft:#6b7280;--blue:#1e3a8a;--blue-light:#3b82f6;--amber:#f59e0b;--line:#e5e7eb;--radius:14px}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html{scroll-behavior:smooth}
-  body{
-    font-family:'Karla',system-ui,sans-serif;background:var(--paper);color:var(--ink);
-    min-height:100vh;padding-bottom:env(safe-area-inset-bottom);
-  }
-  .wrap{max-width:640px;margin:0 auto;padding:0 16px}
-
-  header{background:var(--pine-deep);color:#F4F8F4;padding:20px 0 18px;
-    padding-top:calc(20px + env(safe-area-inset-top))}
+  body{font-family:'Karla',system-ui,sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
+  .wrap{max-width:720px;margin:0 auto;padding:0 16px}
+  header{background:var(--blue);color:#fff;padding:20px 0 18px;padding-top:calc(20px + env(safe-area-inset-top))}
   header h1{font-family:'Fraunces',serif;font-weight:600;font-size:26px;letter-spacing:-.01em}
-  header p{font-size:13.5px;color:#BCD3C4;margin-top:4px;line-height:1.5}
-
-  .controls{position:sticky;top:0;z-index:20;background:var(--paper);
-    padding:12px 0 10px;border-bottom:1px solid var(--line)}
+  header p{font-size:13.5px;color:#dbeafe;margin-top:4px;line-height:1.5}
+  .controls{position:sticky;top:0;z-index:20;background:var(--paper);padding:12px 16px 10px;border-bottom:1px solid var(--line)}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .seg{display:flex;background:#E4EAE3;border-radius:999px;padding:3px;flex:0 0 auto;max-width:100%}
-  .seg button{border:0;background:transparent;font:inherit;font-weight:700;font-size:13px;
-    color:var(--ink-soft);padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
-  .seg button[aria-pressed="true"]{background:var(--pine);color:#fff}
-  select{font:inherit;font-weight:500;font-size:14px;color:var(--ink);
-    border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;flex:0 0 auto}
-  .days{display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:2px;
-    scrollbar-width:none}
+  .seg{display:flex;background:#e0e7ff;border-radius:999px;padding:3px;flex:0 0 auto;overflow-x:auto;max-width:100%;scrollbar-width:thin}
+  .seg::-webkit-scrollbar{height:3px}
+  .seg::-webkit-scrollbar-thumb{background:#bfdbfe}
+  .seg button{border:0;background:transparent;font:inherit;font-weight:700;font-size:13px;color:var(--ink-soft);padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+  .seg button[aria-pressed="true"]{background:var(--blue);color:#fff}
+  select{font:inherit;font-weight:500;font-size:14px;color:var(--ink);border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;flex:0 0 auto}
+  .time-controls{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
+  .time-controls::-webkit-scrollbar{display:none}
+  .time-controls button{border:1px solid var(--line);background:var(--card);font:inherit;font-size:13.5px;font-weight:500;color:var(--ink-soft);padding:6px 13px;border-radius:999px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+  .time-controls button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .days{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
   .days::-webkit-scrollbar{display:none}
-  .days button{border:1px solid var(--line);background:var(--card);font:inherit;
-    font-size:13.5px;font-weight:500;color:var(--ink-soft);padding:6px 13px;
-    border-radius:999px;cursor:pointer;white-space:nowrap}
+  .days button{border:1px solid var(--line);background:var(--card);font:inherit;font-size:13.5px;font-weight:500;color:var(--ink-soft);padding:6px 13px;border-radius:999px;cursor:pointer;white-space:nowrap;flex-shrink:0}
   .days button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
-
-  .hero{margin:16px 0 6px;background:var(--pine);color:#fff;border-radius:var(--radius);
-    padding:18px 18px 16px;cursor:pointer;border:0;text-align:left;width:100%;
-    font:inherit;display:block;position:relative;overflow:hidden}
-  .hero .eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
-    color:#CFE4D6}
-  .hero .name{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:6px 0 4px;
-    line-height:1.2;display:block}
-  .hero .meta{font-size:14px;color:#DCEBE1}
-  .hero .when{position:absolute;right:16px;top:16px;background:var(--amber);color:#3A2A12;
-    font-weight:700;font-size:13px;padding:5px 11px;border-radius:999px}
-
-  .notices{margin:8px 0 4px;padding:10px;background:#FDF4E6;border-radius:var(--radius);
-    border-left:4px solid var(--amber);font-size:13px;color:#5C4A28;line-height:1.5}
+  .hero{margin:16px 0 6px;background:var(--blue);color:#fff;border-radius:var(--radius);padding:18px 18px 16px;cursor:pointer;border:0;text-align:left;width:100%;font:inherit;display:block;position:relative;overflow:hidden}
+  .hero .eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#bfdbfe}
+  .hero .name{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:6px 0 4px;line-height:1.2;display:block}
+  .hero .meta{font-size:14px;color:#dbeafe}
+  .hero .when{position:absolute;right:16px;top:16px;background:var(--amber);color:#78350f;font-weight:700;font-size:13px;padding:5px 11px;border-radius:999px}
+  .notices{margin:8px 0 4px;padding:10px;background:#fef3c7;border-radius:var(--radius);border-left:4px solid var(--amber);font-size:13px;color:#92400e;line-height:1.5}
   .notices strong{display:block;margin-bottom:3px}
-
   .list{padding:10px 0 40px}
   .count{font-size:13px;color:var(--ink-soft);margin:10px 2px 8px}
-  .mtg{display:flex;gap:14px;width:100%;text-align:left;font:inherit;border:1px solid var(--line);
-    background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:8px;
-    cursor:pointer;align-items:flex-start;position:relative}
-  .mtg.community::before{content:"✓";position:absolute;top:10px;right:10px;font-size:16px;
-    color:var(--pine);font-weight:700}
-  .mtg:focus-visible,.hero:focus-visible,button:focus-visible{outline:2px solid var(--pine);outline-offset:2px}
+  .mtg{display:flex;gap:14px;width:100%;text-align:left;font:inherit;border:1px solid var(--line);background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:8px;cursor:pointer;align-items:flex-start;position:relative}
+  .mtg.community::before{content:"✓";position:absolute;top:10px;right:10px;font-size:16px;color:var(--blue);font-weight:700}
+  .mtg:focus-visible,.hero:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
   .t{flex:0 0 62px;font-variant-numeric:tabular-nums}
   .t .hh{font-weight:700;font-size:16px}
   .t .dd{font-size:12px;color:var(--ink-soft);margin-top:1px}
   .m .nm{font-family:'Fraunces',serif;font-weight:600;font-size:16.5px;line-height:1.25;display:block}
   .m .ad{font-size:13.5px;color:var(--ink-soft);margin-top:3px;display:block}
   .m .tags{margin-top:6px;display:flex;gap:5px;flex-wrap:wrap}
-  .pill{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;
-    background:#EAF1EA;color:var(--pine-deep)}
-  .pill.dist{background:#F7EBDA;color:#7A5320}
-  .pill.online{background:#E3ECF6;color:#2A4E77}
-  .pill.community{background:#F0F5FF;color:#1E4A7A}
-
+  .pill{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#dbeafe;color:#1e3a8a}
+  .pill.dist{background:#fef3c7;color:#92400e}
+  .pill.online{background:#ddd6fe;color:#4f46e5}
+  .pill.community{background:#dbeafe;color:#1e3a8a}
   .state{padding:36px 8px;text-align:center;color:var(--ink-soft);font-size:14.5px;line-height:1.55}
   .state strong{color:var(--ink)}
-  .state .retry{margin-top:14px;border:0;background:var(--pine);color:#fff;font:inherit;
-    font-weight:700;padding:10px 22px;border-radius:999px;cursor:pointer}
-  .skel{height:74px;border-radius:var(--radius);margin-bottom:8px;
-    background:linear-gradient(90deg,#E8EDE7 25%,#F0F4EF 50%,#E8EDE7 75%);
-    background-size:200% 100%;animation:sh 1.2s infinite}
+  .state .retry{margin-top:14px;border:0;background:var(--blue);color:#fff;font:inherit;font-weight:700;padding:10px 22px;border-radius:999px;cursor:pointer}
+  .skel{height:74px;border-radius:var(--radius);margin-bottom:8px;background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:sh 1.2s infinite}
   @keyframes sh{to{background-position:-200% 0}}
   @media (prefers-reduced-motion:reduce){.skel{animation:none}}
-
-  .ovl{position:fixed;inset:0;background:rgba(18,30,24,.55);z-index:40;display:flex;
-    align-items:flex-end;justify-content:center}
-  .sheet{background:var(--card);width:100%;max-width:640px;border-radius:18px 18px 0 0;
-    max-height:88vh;overflow-y:auto;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
-  .sheet .top{position:sticky;top:0;background:var(--card);padding:16px 18px 12px;
-    border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}
+  .ovl{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+  .sheet{background:var(--card);width:100%;max-width:720px;border-radius:18px 18px 0 0;max-height:88vh;overflow-y:auto;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+  .sheet .top{position:sticky;top:0;background:var(--card);padding:16px 18px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
   .sheet h2{font-family:'Fraunces',serif;font-weight:600;font-size:21px;line-height:1.25}
-  .sheet .x{border:0;background:#EDF1EC;border-radius:999px;width:34px;height:34px;
-    font-size:17px;cursor:pointer;color:var(--ink-soft);flex:0 0 auto}
+  .sheet .x{border:0;background:#f3f4f6;border-radius:999px;width:34px;height:34px;font-size:17px;cursor:pointer;color:var(--ink-soft);flex:0 0 auto;align-self:center}
   .sheet .bd{padding:14px 18px}
   .kv{margin-bottom:14px}
-  .kv .k{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--ink-soft);margin-bottom:3px}
+  .kv .k{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:3px}
   .kv .v{font-size:15.5px;line-height:1.45}
-  .kv a{color:var(--pine);font-weight:700;text-decoration:none}
+  .kv a{color:var(--blue);font-weight:700;text-decoration:none}
   .btns{display:flex;gap:8px;margin-top:6px}
-  .btns a{flex:1;text-align:center;font-weight:700;font-size:14.5px;text-decoration:none;
-    padding:12px;border-radius:11px}
-  .btns .g{background:var(--pine);color:#fff}
-  .btns .a{background:#EDF1EC;color:var(--ink)}
-  .submit-btn{width:100%;border:0;background:var(--amber);color:#3A2A12;font:inherit;
-    font-weight:700;padding:12px;border-radius:11px;cursor:pointer;margin-top:8px}
-  .src{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);
-    font-size:12.5px;color:var(--ink-soft);line-height:1.5}
-  .src a{color:var(--pine)}
-
+  .btns a{flex:1;text-align:center;font-weight:700;font-size:14.5px;text-decoration:none;padding:12px;border-radius:11px}
+  .btns .g{background:var(--blue);color:#fff}
+  .btns .a{background:#f3f4f6;color:var(--ink)}
+  .submit-btn{width:100%;border:0;background:var(--amber);color:#78350f;font:inherit;font-weight:700;padding:12px;border-radius:11px;cursor:pointer;margin-top:8px}
+  .src{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+  .src a{color:var(--blue)}
   footer{padding:8px 16px 28px;text-align:center;font-size:12.5px;color:var(--ink-soft);line-height:1.6}
-  footer a{color:var(--pine)}
+  footer a{color:var(--blue)}
 </style>
 </head>
 <body>
-
 <header>
   <div class="wrap">
     <h1>We Do Recover</h1>
     <p>All pathways welcome · find the next meeting near you · free · no account</p>
   </div>
 </header>
-
 <div class="controls">
   <div class="wrap">
-    <div class="row" id="fellowship-row"></div>
     <div class="row">
       <select id="radius" aria-label="Search radius">
         <option value="5">5 mi</option>
@@ -141,339 +101,60 @@
         <option value="50">50 mi</option>
       </select>
     </div>
+    <div class="seg" id="fellowship-row" role="group" aria-label="Fellowship"></div>
     <div class="days" id="days" role="group" aria-label="Day of week"></div>
+    <div class="time-controls" id="times" role="group" aria-label="Time of day"></div>
   </div>
 </div>
-
 <main class="wrap">
   <div id="hero"></div>
   <div id="notices"></div>
   <div class="list" id="list"></div>
 </main>
-
 <footer>
   Data comes live from official AA and NA directories, SMART, Refuge Recovery, Women for Sobriety, S.O.S., LifeRing, She Recovers, and Celebrate Recovery — plus community submissions (moderated). 
   <a href="#submit" id="submit-link">Submit or update a meeting</a>. Always confirm directly with the source — schedules change.
 </footer>
-
 <div id="sheetRoot"></div>
-
 <script>
 const $ = (s) => document.querySelector(s);
 const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const DAYS_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const FELLOWSHIPS = {AA:{label:"AA",full:"Alcoholics Anonymous"},NA:{label:"NA",full:"Narcotics Anonymous"},SMART:{label:"SMART",full:"SMART Recovery"},RR:{label:"Refuge",full:"Refuge Recovery"},WFS:{label:"WFS",full:"Women for Sobriety"},SOS:{label:"S.O.S.",full:"Secular Organizations for Sobriety"},LR:{label:"LifeRing",full:"LifeRing Secular Recovery"},SR:{label:"She Recovers",full:"She Recovers"},CR:{label:"Celebrate",full:"Celebrate Recovery"}};
 
-const FELLOWSHIPS = {
-  AA: { label: "AA", full: "Alcoholics Anonymous" },
-  NA: { label: "NA", full: "Narcotics Anonymous" },
-  SMART: { label: "SMART", full: "SMART Recovery" },
-  RR: { label: "Refuge", full: "Refuge Recovery" },
-  WFS: { label: "WFS", full: "Women for Sobriety" },
-  SOS: { label: "S.O.S.", full: "Secular Organizations for Sobriety" },
-  LR: { label: "LifeRing", full: "LifeRing Secular Recovery" },
-  SR: { label: "She Recovers", full: "She Recovers" },
-  CR: { label: "Celebrate", full: "Celebrate Recovery" },
-};
+const state = {fellowship:"NA",radius:25,day:new Date().getDay(),timeFilter:"all",loc:null,meetings:[],notices:[],loading:true,error:null};
 
-const state = {
-  fellowship: "NA",
-  radius: 25,
-  day: new Date().getDay(),
-  loc: null,
-  meetings: [],
-  notices: [],
-  loading: true,
-  error: null,
-};
+function renderFellowships(){const btns=Object.entries(FELLOWSHIPS).map(([k,v])=>`<button data-f="${k}" aria-pressed="${k===state.fellowship}" title="${v.full}">${v.label}</button>`).join("");$("#fellowship-row").innerHTML=btns;$("#fellowship-row").querySelectorAll("button").forEach(b=>{b.onclick=()=>{state.fellowship=b.dataset.f;renderFellowships();load()}});}
+function renderDays(){const today=new Date().getDay();$("#days").innerHTML=[0,1,2,3,4,5,6].map(i=>{const d=(today+i)%7;const label=i===0?"Today":i===1?"Tomorrow":DAYS_SHORT[d];return`<button data-day="${d}" aria-pressed="${d===state.day}">${label}</button>`}).join("");$("#days").querySelectorAll("button").forEach(b=>{b.onclick=()=>{state.day=+b.dataset.day;renderDays();load()}});}
+function renderTimes(){$("#times").innerHTML=['<button data-time="all" aria-pressed="true">All times</button>','<button data-time="morning">Morning (5-11am)</button>','<button data-time="afternoon">Afternoon (11am-5pm)</button>','<button data-time="evening">Evening (5pm+)</button>'].join("");$("#times").querySelectorAll("button").forEach(b=>{b.onclick=()=>{state.timeFilter=b.dataset.time;renderTimes();render()}});}
+function fmtTime(t){if(!t)return"";const[h,m]=t.split(":").map(Number);if(isNaN(h))return t;const ap=h>=12?"PM":"AM";return`${((h+11)%12)+1}:${String(m).padStart(2,"0")} ${ap}`}
+function minutesUntil(m){const now=new Date();const[h,mi]=(m.time||"").split(":").map(Number);if(isNaN(h)||isNaN(mi))return 9999;let dd=(m.day-now.getDay()+7)%7;let mins=dd*1440+(h*60+mi)-(now.getHours()*60+now.getMinutes());if(mins<0)mins+=7*1440;return mins}
+function untilLabel(mins){if(mins<60)return`in ${mins} min`;if(mins<1440)return`in ${Math.round(mins/60)} hr`;return`in ${Math.round(mins/1440)} d`}
+function matchesTimeFilter(timeStr){if(state.timeFilter==="all")return true;const[h]=timeStr.split(":").map(Number);if(state.timeFilter==="morning")return h>=5&&h<12;if(state.timeFilter==="afternoon")return h>=12&&h<17;if(state.timeFilter==="evening")return h>=17;return true}
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-function renderFellowships(){
-  const btns = Object.entries(FELLOWSHIPS).map(([k, v]) => 
-    `<button id="f${k}" data-f="${k}" aria-pressed="${k === state.fellowship}" title="${v.full}">${v.label}</button>`
-  ).join("");
-  const row = document.createElement("div");
-  row.className = "seg";
-  row.setAttribute("role", "group");
-  row.setAttribute("aria-label", "Fellowship");
-  row.innerHTML = btns;
-  $("#fellowship-row").innerHTML = "";
-  $("#fellowship-row").appendChild(row);
-  row.querySelectorAll("button").forEach(b => {
-    b.onclick = () => {
-      state.fellowship = b.dataset.f;
-      renderFellowships();
-      render();
-    };
-  });
-}
+async function load(){state.loading=true;state.error=null;state.meetings=[];state.notices=[];render();try{const la=state.loc.lat.toFixed(2),ln=state.loc.lng.toFixed(2);const r=await fetch(`/api/meetings?fellowship=${state.fellowship}&lat=${la}&lng=${ln}&radius=${state.radius}`);const j=await r.json();if(!r.ok)throw new Error(j.error||"Request failed");state.meetings=j.meetings||[];state.notices=j.notices||[];state.full_name=j.full_name;state.official_finder=j.official_finder}catch(e){state.error=e.message||String(e)}state.loading=false;render()}
 
-function renderDays(){
-  const today = new Date().getDay();
-  $("#days").innerHTML = [0,1,2,3,4,5,6].map(i=>{
-    const d = (today + i) % 7;
-    const label = i===0 ? "Today" : i===1 ? "Tomorrow" : DAYS_SHORT[d];
-    return `<button data-day="${d}" aria-pressed="${d===state.day}">${label}</button>`;
-  }).join("");
-  $("#days").querySelectorAll("button").forEach(b=>{
-    b.onclick = ()=>{ state.day = +b.dataset.day; renderDays(); render(); };
-  });
-}
+function locate(){if(!navigator.geolocation){state.error="Location isn't available in this browser.";state.loading=false;render();return}navigator.geolocation.getCurrentPosition(p=>{state.loc={lat:p.coords.latitude,lng:p.coords.longitude};load()},()=>{state.error="We need your location to find nearby meetings. Allow location access and try again.";state.loading=false;render()})}
 
-async function load(){
-  state.loading = true; state.error = null; state.meetings = []; state.notices = []; render();
-  try{
-    const la = state.loc.lat.toFixed(2), ln = state.loc.lng.toFixed(2);
-    const r = await fetch(`/api/meetings?fellowship=${state.fellowship}&lat=${la}&lng=${ln}&radius=${state.radius}`);
-    const j = await r.json();
-    if(!r.ok) throw new Error(j.error || "Request failed");
-    state.meetings = j.meetings || [];
-    state.notices = j.notices || [];
-    state.full_name = j.full_name;
-    state.official_finder = j.official_finder;
-  }catch(e){
-    state.error = e.message || String(e);
-  }
-  state.loading = false; render();
-}
+function render(){const heroEl=$("#hero"),listEl=$("#list"),notEl=$("#notices");if(state.loading){heroEl.innerHTML="";notEl.innerHTML="";listEl.innerHTML=`<div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>`;return}if(state.error){heroEl.innerHTML="";notEl.innerHTML="";listEl.innerHTML=`<div class="state"><strong>Couldn't load meetings.</strong><br>${esc(state.error)}<br><a href="${esc(state.official_finder||'#')}" rel="noopener" style="color:var(--blue)">Try the official finder</a><br><button class="retry" id="retryBtn">Try again</button></div>`;$("#retryBtn").onclick=()=>state.loc?load():locate();return}
 
-function locate(){
-  if(!navigator.geolocation){
-    state.error = "Location isn't available in this browser."; state.loading=false; render(); return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    p => { state.loc = {lat:p.coords.latitude, lng:p.coords.longitude}; load(); },
-    () => { state.error = "We need your location to find nearby meetings. Allow location access and try again.";
-            state.loading=false; render(); }
-  );
-}
+const soonest=[...state.meetings].sort((a,b)=>minutesUntil(a)-minutesUntil(b))[0];heroEl.innerHTML=soonest?`<button class="hero" data-i="${state.meetings.indexOf(soonest)}"><span class="eyebrow">Next ${esc(state.full_name)} meeting</span><span class="when">${untilLabel(minutesUntil(soonest))}</span><span class="name">${esc(soonest.name)}</span><span class="meta">${DAYS[soonest.day]} ${fmtTime(soonest.time)} · ${soonest.distance} mi · ${esc(soonest.city||soonest.venue)}</span></button>`:"";
 
-function fmtTime(t){
-  if(!t) return "";
-  const [h,m] = t.split(":").map(Number);
-  if(isNaN(h)) return t;
-  const ap = h>=12 ? "PM" : "AM";
-  return `${((h+11)%12)+1}:${String(m).padStart(2,"0")} ${ap}`;
-}
+notEl.innerHTML=state.notices.slice(0,3).map(n=>{let msg="";if(n.kind==="temporary")msg=`⏰ Temporary: <strong>${esc(n.meeting_name)}</strong> — ${esc(n.details||"meeting details changing")}`;else if(n.kind==="change")msg=`📝 Changed: <strong>${esc(n.meeting_name)}</strong> — ${esc(n.details||"meeting details changed")}`;else if(n.kind==="remove")msg=`⛔ Removed: <strong>${esc(n.meeting_name)}</strong> — ${esc(n.details||"no longer listed")}`;return`<div class="notices">${msg}</div>`}).join("");
 
-function minutesUntil(m){
-  const now = new Date();
-  const [h,mi] = (m.time || "").split(":").map(Number);
-  if(isNaN(h) || isNaN(mi)) return 9999;
-  let dd = (m.day - now.getDay() + 7) % 7;
-  let mins = dd*1440 + (h*60+mi) - (now.getHours()*60+now.getMinutes());
-  if(mins < 0) mins += 7*1440;
-  return mins;
-}
+const dayList=state.meetings.filter(m=>m.day===state.day&&matchesTimeFilter(m.time||"")).sort((a,b)=>(a.time||"").localeCompare(b.time||"")||(a.distance||9999)-(b.distance||9999));
 
-function untilLabel(mins){
-  if(mins < 60) return `in ${mins} min`;
-  if(mins < 1440) return `in ${Math.round(mins/60)} hr`;
-  return `in ${Math.round(mins/1440)} d`;
-}
+if(dayList.length===0){listEl.innerHTML=`<div class="state">No meetings listed for <strong>${DAYS[state.day]}</strong> within ${state.radius} miles.<br>Try another day, time, or widen the radius.<br><a href="${esc(state.official_finder||'#')}" rel="noopener" style="color:var(--blue)">Check the official finder</a></div>`}else{const community=dayList.filter(m=>m.community).length;listEl.innerHTML=`<p class="count">${dayList.length} meeting${dayList.length===1?"":"s"} on ${DAYS[state.day]} · within ${state.radius} mi${community?` · ${community} from community`:""}</p>`+dayList.map(m=>`<button class="mtg ${m.community?'community':''}" data-i="${state.meetings.indexOf(m)}"><span class="t"><span class="hh">${fmtTime(m.time||"").replace(" ","<br>")||"TBA"}</span></span><span class="m"><span class="nm">${esc(m.name)}</span><span class="ad">${esc(m.venue?m.venue+" · ":"")}${esc(m.address||m.city)}</span><span class="tags">${m.distance!=null?`<span class="pill dist">${m.distance} mi</span>`:""}${m.online_url?'<span class="pill online">Online</span>':''}${m.community?'<span class="pill community">Community</span>':''}</span></span></button>`).join("")}
 
-const esc = s => String(s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+document.querySelectorAll("[data-i]").forEach(b=>{b.onclick=()=>openSheet(state.meetings[+b.dataset.i])})}
 
-function render(){
-  const heroEl = $("#hero"), listEl = $("#list"), notEl = $("#notices");
+function openSheet(m){const q=encodeURIComponent(m.address||`${m.lat},${m.lng}`);$("#sheetRoot").innerHTML=`<div class="ovl" id="ovl"><div class="sheet"><div class="top"><div><span class="pill">${esc(m.fellowship)} ${m.community?'· Community':''}</span><h2>${esc(m.name)}</h2></div><button class="x" aria-label="Close">✕</button></div><div class="bd"><div class="kv"><div class="k">When</div><div class="v">${DAYS[m.day]}s at ${fmtTime(m.time)||"Time TBA"}</div></div><div class="kv"><div class="k">Where</div><div class="v">${esc(m.venue?m.venue+" · ":"")}${esc(m.address||m.city)}<br><span style="color:var(--ink-soft);font-size:13.5px">${m.distance?m.distance+" miles from you":"Distance unknown"}</span></div></div>${m.online_url?`<div class="kv"><div class="k">Join online</div><div class="v"><a href="${esc(m.online_url)}" rel="noopener">Open meeting link</a></div></div>`:""}${m.notes?`<div class="kv"><div class="k">Notes</div><div class="v">${esc(m.notes)}</div></div>`:""}${m.formats&&m.formats.length?`<div class="kv"><div class="k">Formats</div><div class="v">${m.formats.join(", ")}</div></div>`:""}${m.community?"":"<div class=\"btns\"><a class=\"g\" href=\"https://maps.google.com/?q=${q}\" rel=\"noopener\">Google Maps</a><a class=\"a\" href=\"https://maps.apple.com/?q=${q}\">Apple Maps</a></div>"}${!m.community?`<button class="submit-btn" onclick="alert('Report feature coming soon')">Report a change</button>`:""}${m.community?"":"<div class=\"src\">Listing from <a href=\""+esc(m.source_url)+"\" rel=\"noopener\">"+esc(m.source)+"</a><br>Schedules change — if this meeting matters to your day, confirm directly.</div>"}${m.community?"<div class=\"src\"><strong>Community submission</strong> · reviewed and approved by volunteers</div>":""}</div></div></div>`;const close=()=>{$("#sheetRoot").innerHTML=""};$("#ovl").onclick=e=>{if(e.target.id==="ovl")close()};$(".x").onclick=close;document.addEventListener("keydown",function esc_(e){if(e.key==="Escape"){close();document.removeEventListener("keydown",esc_)}})}
 
-  if(state.loading){
-    heroEl.innerHTML = "";
-    notEl.innerHTML = "";
-    listEl.innerHTML = `<div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>`;
-    return;
-  }
-  if(state.error){
-    heroEl.innerHTML = "";
-    notEl.innerHTML = "";
-    listEl.innerHTML = `<div class="state"><strong>Couldn't load meetings.</strong><br>${esc(state.error)}<br>
-      <a href="${esc(state.official_finder || '#')}" rel="noopener" style="color:var(--pine)">Try the official finder</a>
-      <br><button class="retry" id="retryBtn">Try again</button></div>`;
-    $("#retryBtn").onclick = ()=> state.loc ? load() : locate();
-    return;
-  }
+$("#radius").onchange=e=>{state.radius=+e.target.value;load()};
+$("#submit-link").onclick=()=>{$("#sheetRoot").innerHTML=`<div class="ovl" id="ovl"><div class="sheet"><div class="top"><h2>Submit or update a meeting</h2><button class="x" aria-label="Close">✕</button></div><div class="bd"><p style="font-size:14px;color:var(--ink-soft);margin-bottom:16px">Help us keep this directory current. You can:<br>• <strong>Add a new meeting</strong><br>• <strong>Report a change</strong> (time, location)<br>• <strong>Report a meeting that no longer meets</strong><br>• <strong>Post a short-notice update</strong></p><form id="submitForm"><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">What are you submitting?</div><select name="kind" style="width:100%"><option value="new">New meeting</option><option value="change">Change to existing meeting</option><option value="remove">Meeting no longer meets</option><option value="temporary">Short-notice update</option></select></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Fellowship</div><select name="fellowship" style="width:100%">${Object.entries(FELLOWSHIPS).map(([k,v])=>`<option value="${k}" ${k===state.fellowship?'selected':''}>${v.full}</option>`).join("")}</select></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Meeting name *</div><input type="text" name="meeting_name" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" placeholder="e.g., Fresh Start Group" required /></label><label style="display:block;margin-bottom:12px"><div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">What changed? (required)</div><textarea name="details" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;min-height:60px" placeholder="Describe the change or update." required></textarea></label><button type="submit" style="width:100%;background:var(--blue);color:#fff;border:0;font-weight:700;padding:12px;border-radius:8px;cursor:pointer;font:inherit">Submit for review</button><p style="font-size:12px;color:var(--ink-soft);margin-top:12px;line-height:1.5">✓ Reviewed within 24 hours<br>✓ Completely anonymous</p></form></div></div></div>`;$("#submitForm").onsubmit=async(e)=>{e.preventDefault();const fd=new FormData($("#submitForm"));const d=Object.fromEntries(fd);d.lat=state.loc?.lat;d.lng=state.loc?.lng;try{const r=await fetch("https://qdxufynzilmqzhortyrq.supabase.co/rest/v1/submissions",{method:"POST",headers:{"Content-Type":"application/json","apikey":"sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39","Authorization":"Bearer sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39"},body:JSON.stringify(d)});if(r.ok){$("#sheetRoot").innerHTML=`<div class="ovl" id="ovl"><div class="sheet"><div class="bd" style="text-align:center;padding:60px 20px"><h2 style="margin-bottom:12px">Thank you ✓</h2><p style="color:var(--ink-soft);margin-bottom:20px">Your submission has been received and will be reviewed within 24 hours.</p><button class="submit-btn" onclick="document.getElementById('ovl').parentElement.innerHTML=''">Close</button></div></div></div>`}else{alert("Error submitting. Please try again.")}}catch(err){alert("Error: "+err.message)}};$(".x").onclick=()=>{$("#sheetRoot").innerHTML=""};$("#ovl").onclick=e=>{if(e.target.id==="ovl")$("#sheetRoot").innerHTML=""}};
 
-  const soonest = [...state.meetings].sort((a,b)=>minutesUntil(a)-minutesUntil(b))[0];
-  heroEl.innerHTML = soonest ? `
-    <button class="hero" data-i="${state.meetings.indexOf(soonest)}">
-      <span class="eyebrow">Next ${esc(state.full_name)} meeting</span>
-      <span class="when">${untilLabel(minutesUntil(soonest))}</span>
-      <span class="name">${esc(soonest.name)}</span>
-      <span class="meta">${DAYS[soonest.day]} ${fmtTime(soonest.time)} · ${soonest.distance} mi · ${esc(soonest.city || soonest.venue)}</span>
-    </button>` : "";
-
-  notEl.innerHTML = state.notices.slice(0, 3).map(n => {
-    let msg = "";
-    if(n.kind === "temporary") msg = `⏰ Temporary update: <strong>${esc(n.meeting_name)}</strong> — ${esc(n.details || "meeting details changing")}`;
-    else if(n.kind === "change") msg = `📝 Changed: <strong>${esc(n.meeting_name)}</strong> — ${esc(n.details || "meeting details changed")}`;
-    else if(n.kind === "remove") msg = `⛔ Removed: <strong>${esc(n.meeting_name)}</strong> — ${esc(n.details || "no longer listed")}`;
-    return `<div class="notices">${msg}</div>`;
-  }).join("");
-
-  const dayList = state.meetings
-    .filter(m=>m.day===state.day)
-    .sort((a,b)=> (a.time || "").localeCompare(b.time || "") || (a.distance || 9999)-(b.distance || 9999));
-
-  if(dayList.length===0){
-    listEl.innerHTML = `<div class="state">No meetings listed for
-      <strong>${DAYS[state.day]}</strong> within ${state.radius} miles.<br>
-      Try another day or widen the radius.<br>
-      <a href="${esc(state.official_finder || '#')}" rel="noopener" style="color:var(--pine)">Check the official finder</a></div>`;
-  } else {
-    const community = dayList.filter(m => m.community).length;
-    listEl.innerHTML =
-      `<p class="count">${dayList.length} meeting${dayList.length===1?"":"s"} on ${DAYS[state.day]} · within ${state.radius} mi${community ? ` · ${community} from community` : ""}</p>` +
-      dayList.map(m=>`
-        <button class="mtg ${m.community ? 'community' : ''}" data-i="${state.meetings.indexOf(m)}">
-          <span class="t"><span class="hh">${fmtTime(m.time || "").replace(" ","<br>") || "TBA"}</span></span>
-          <span class="m">
-            <span class="nm">${esc(m.name)}</span>
-            <span class="ad">${esc(m.venue ? m.venue + " · " : "")}${esc(m.address || m.city)}</span>
-            <span class="tags">
-              ${m.distance != null ? `<span class="pill dist">${m.distance} mi</span>` : ""}
-              ${m.online_url ? '<span class="pill online">Online</span>' : ""}
-              ${m.community ? '<span class="pill community">Community</span>' : ""}
-            </span>
-          </span>
-        </button>`).join("");
-  }
-
-  document.querySelectorAll("[data-i]").forEach(b=>{
-    b.onclick = ()=>openSheet(state.meetings[+b.dataset.i]);
-  });
-}
-
-function openSheet(m){
-  const q = encodeURIComponent(m.address || `${m.lat},${m.lng}`);
-  $("#sheetRoot").innerHTML = `
-    <div class="ovl" id="ovl">
-      <div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(m.name)}">
-        <div class="top">
-          <div>
-            <span class="pill">${esc(m.fellowship)} ${m.community ? '· Community' : ''}</span>
-            <h2>${esc(m.name)}</h2>
-          </div>
-          <button class="x" aria-label="Close">✕</button>
-        </div>
-        <div class="bd">
-          <div class="kv"><div class="k">When</div>
-            <div class="v">${DAYS[m.day]}s at ${fmtTime(m.time) || "Time TBA"}</div></div>
-          <div class="kv"><div class="k">Where</div>
-            <div class="v">${esc(m.venue ? m.venue + " · " : "")}${esc(m.address || m.city)}<br>
-            <span style="color:var(--ink-soft);font-size:13.5px">${m.distance ? m.distance + " miles from you" : "Distance unknown"}</span></div></div>
-          ${m.online_url ? `<div class="kv"><div class="k">Join online</div>
-            <div class="v"><a href="${esc(m.online_url)}" rel="noopener">Open meeting link</a></div></div>` : ""}
-          ${m.notes ? `<div class="kv"><div class="k">Notes</div><div class="v">${esc(m.notes)}</div></div>` : ""}
-          <div class="btns">
-            <a class="g" href="https://maps.google.com/?q=${q}" rel="noopener">Directions</a>
-            <a class="a" href="maps://maps.apple.com/?q=${q}">Apple Maps</a>
-          </div>
-          ${!m.community ? `<button class="submit-btn" onclick="window.location.hash='#submit'">Report a change</button>` : ""}
-          <div class="src">
-            ${m.community ? 
-              `<strong>Community submission</strong> · reviewed and approved by the moderation team` : 
-              `Listing from <a href="${esc(m.source_url)}" rel="noopener">${esc(m.source)}</a>`
-            }<br>
-            Schedules change — if this meeting matters to your day, confirm directly.
-          </div>
-        </div>
-      </div>
-    </div>`;
-  const close = ()=>{ $("#sheetRoot").innerHTML=""; };
-  $("#ovl").onclick = e=>{ if(e.target.id==="ovl") close(); };
-  $(".x").onclick = close;
-  document.addEventListener("keydown", function esc_(e){ if(e.key==="Escape"){close();document.removeEventListener("keydown",esc_);} });
-}
-
-$("#radius").onchange = e=>{ state.radius=+e.target.value; load(); };
-$("#submit-link").onclick = () => {
-  $("#sheetRoot").innerHTML = `
-    <div class="ovl" id="ovl">
-      <div class="sheet">
-        <div class="top">
-          <h2>Submit or update a meeting</h2>
-          <button class="x" aria-label="Close">✕</button>
-        </div>
-        <div class="bd">
-          <p style="font-size:14px;color:var(--ink-soft);margin-bottom:16px">
-            Help us keep this directory current. You can:<br>
-            • <strong>Add a new meeting</strong><br>
-            • <strong>Report a change</strong> (time, location, format)<br>
-            • <strong>Report a meeting that no longer meets</strong><br>
-            • <strong>Post a short-notice update</strong> (e.g., one-time cancellation)
-          </p>
-          <form id="submitForm">
-            <label style="display:block;margin-bottom:12px">
-              <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">What are you submitting?</div>
-              <select name="kind" style="width:100%">
-                <option value="new">New meeting</option>
-                <option value="change">Change to existing meeting</option>
-                <option value="remove">Meeting no longer meets</option>
-                <option value="temporary">Short-notice update</option>
-              </select>
-            </label>
-            <label style="display:block;margin-bottom:12px">
-              <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Fellowship</div>
-              <select name="fellowship" style="width:100%">
-                ${Object.entries(FELLOWSHIPS).map(([k, v]) => `<option value="${k}" ${k === state.fellowship ? 'selected' : ''}>${v.full}</option>`).join("")}
-              </select>
-            </label>
-            <label style="display:block;margin-bottom:12px">
-              <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Meeting name *</div>
-              <input type="text" name="meeting_name" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" placeholder="e.g., Fresh Start Group" required />
-            </label>
-            <label style="display:block;margin-bottom:12px">
-              <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">What changed? (required)</div>
-              <textarea name="details" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;min-height:60px" placeholder="Describe the change, update, or removal. Be specific." required></textarea>
-            </label>
-            <button type="submit" style="width:100%;background:var(--pine);color:#fff;border:0;font-weight:700;padding:12px;border-radius:8px;cursor:pointer;font:inherit">Submit for review</button>
-            <p style="font-size:12px;color:var(--ink-soft);margin-top:12px;line-height:1.5">
-              ✓ Your submission will be reviewed within 24 hours before appearing publicly.<br>
-              ✓ We don't collect any personal info — your submission is anonymous.
-            </p>
-          </form>
-        </div>
-      </div>
-    </div>`;
-  $("#submitForm").onsubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData($("#submitForm"));
-    const data = Object.fromEntries(formData);
-    data.lat = state.loc?.lat;
-    data.lng = state.loc?.lng;
-    try {
-      const r = await fetch("https://qdxufynzilmqzhortyrq.supabase.co/rest/v1/submissions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": "sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39",
-          "Authorization": "Bearer sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39"
-        },
-        body: JSON.stringify(data)
-      });
-      if (r.ok) {
-        $("#sheetRoot").innerHTML = `
-          <div class="ovl" id="ovl">
-            <div class="sheet">
-              <div class="bd" style="text-align:center;padding:60px 20px">
-                <h2 style="margin-bottom:12px">Thank you ✓</h2>
-                <p style="color:var(--ink-soft);margin-bottom:20px">Your submission has been received and will be reviewed within 24 hours.</p>
-                <button class="submit-btn" onclick="document.getElementById('ovl').parentElement.innerHTML=''">Close</button>
-              </div>
-            </div>
-          </div>`;
-      } else {
-        alert("Error submitting. Please try again.");
-      }
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
-  };
-  $(".x").onclick = () => { $("#sheetRoot").innerHTML = ""; };
-  $("#ovl").onclick = e => { if (e.target.id === "ovl") $("#sheetRoot").innerHTML = ""; };
-};
-
-renderFellowships();
-renderDays();
-locate();
+renderFellowships();renderDays();renderTimes();locate();
 </script>
 </body>
 </html>
