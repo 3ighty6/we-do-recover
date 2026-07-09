@@ -149,14 +149,20 @@ async function load(){
       }
     } else {
       // Fetch community submissions for this fellowship
-      const res = await fetch(`https://qdxufynzilmqzhortyrq.supabase.co/rest/v1/approved_meetings?fellowship=eq.${state.fellowship}&status=eq.approved`, {
-        headers: {apikey: "sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39"}
+      const url = `https://qdxufynzilmqzhortyrq.supabase.co/rest/v1/approved_meetings?fellowship=eq.${state.fellowship}&status=eq.approved`;
+      const res = await fetch(url, {
+        headers: {
+          apikey: "sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39",
+          "Content-Type": "application/json"
+        }
       });
       if (res.ok) {
         const data = await res.json();
-        state.meetings = Array.isArray(data) ? data.map(m => ({
-          name: m.meeting_name, day: m.day, time: m.time || "", venue: m.venue, city: m.city, distance: 0, community: true
+        state.meetings = Array.isArray(data) ? data.filter(m => m.meeting_name && m.day !== null).map(m => ({
+          name: m.meeting_name, day: m.day, time: m.time || "", venue: m.venue || "", city: m.city || "", distance: 0, community: true
         })) : [];
+      } else {
+        state.meetings = [];
       }
     }
   } catch(e) {
