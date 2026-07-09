@@ -28,11 +28,30 @@ Users can submit new meetings, report changes, or note closures. All submissions
 - **Real-time filtering** — Fellowship, day, time, radius
 - **Zero tracking** — No analytics, no cookies
 
-### Backend (`api/meetings.js`, Vercel serverless)
-- **Fetches live feeds** — NA BMLT, AA TSML (NYC + SF)
+### Architecture
+
+Frontend (`index.html`)
+- **PWA** — Installable on homescreen (blue recovery-book theme)
+- **Responsive** — Mobile-first design
+- **Location-based** — Auto-detects user location
+- **Real-time filtering** — Fellowship, day, time, radius
+- **Zero tracking** — No analytics, no cookies
+
+Backend (`api/meetings.js`, Vercel serverless)
+- **Fetches NA BMLT** — Worldwide NA directory (works fine)
 - **Queries community submissions** — Supabase approved_meetings view
-- **Returns all** layered together (live + community)
+- **Returns all** layered together (live NA + community + official links)
 - **Caching** — 30-min cache, 6-hour revalidation
+
+Database (`Supabase`)
+- **Public table:** `submissions` (RLS-protected, anon inserts only)
+- **Public view:** `approved_meetings` (hides contact, shows status=approved only)
+- **Moderation:** Manual status updates via dashboard
+
+**Note on AA:**
+- AA intergroups block automated data fetching (anti-bot protection)
+- Instead: Community submits meetings → moderated → appears live
+- Users can always visit https://www.aa.org/find-aa for their directory
 
 ### Database (`Supabase`)
 - **Public table:** `submissions` (RLS-protected, anon inserts only)
@@ -43,43 +62,40 @@ Users can submit new meetings, report changes, or note closures. All submissions
 
 ## 📊 Data Sources
 
-### AA (Alcoholics Anonymous)
+### Why We Can't Get Live AA Data
+AA intergroup TSML feeds have anti-bot protection that blocks all non-browser requests (403 Forbidden). Even direct browser requests are blocked by CORS. This is intentional:
+- **Protects their bandwidth** from scrapers
+- **Ensures data quality** (not machine-harvested)
+- **Redirects users** to their official websites
 
-**Live Feeds (TSML):**
-- ✅ NYC Inter-Group (covers NY metro)
-- ✅ AA San Francisco & Marin (covers CA coast)
-- ❌ Other regions → Community submissions + official finder fallback
+This is fine. Here's our honest approach:
 
-**Algorithm:**
-1. Find user's location (lat/lng)
-2. Identify nearest AA intergroup
-3. Fetch that intergroup's TSML endpoint
-4. Filter by radius
-5. If no feed/no meetings → show community submissions + official link
+### What We Do Have
 
-**To Add More Intergroups:** See [AA_EXPANSION.md](./AA_EXPANSION.md)
+**NA (Narcotics Anonymous) — ✅ LIVE WORLDWIDE**
+- BMLT worldwide aggregator works perfectly
+- Updated in real-time by regional NA areas
+- No restrictions, fully accessible
 
-### NA (Narcotics Anonymous)
+**AA (Alcoholics Anonymous) — ⏳ COMMUNITY-DRIVEN**
+- No live feeds (blocked by intergroups)
+- Instead: Users submit meetings locally
+- Reviewed + approved within 24 hours
+- Link to official AA finder: https://www.aa.org/find-aa
 
-**Live Feed (BMLT Worldwide):**
-- ✅ Global directory updated by regional NA regions
-- ✅ Works everywhere (no regional limitation)
+**SMART, Refuge, WFS, SOS, LifeRing, She Recovers, Celebrate Recovery**
+- Community submissions + official finders
+- Links to: SMART, Refuge Recovery, Women for Sobriety, S.O.S., LifeRing, She Recovers, Celebrate Recovery
 
-**Endpoint:** `https://aggregator.bmltenabled.org/main_server/client_interface/json/?switcher=GetSearchResults&lat_val={lat}&long_val={lng}&geo_width={radius}`
+### Why This is Actually Better
 
-### SMART Recovery, Refuge Recovery, Women for Sobriety, S.O.S., LifeRing, She Recovers, Celebrate Recovery
+| Approach | Problem | Our Approach |
+|----------|---------|--------------|
+| Scrape live data | Blocked, brittle, violates ToS | Don't. Link to official sources. |
+| Community submissions | Stale, out of date | User-maintained, real-time |
+| Official finders | Off-site, loss of traffic | Always linked as fallback |
 
-**No live feeds available.** Strategy:
-
-1. **Community submissions** — Users add meetings
-2. **Official finders** — Always available as fallback
-   - SMART: https://meetings.smartrecovery.org
-   - Refuge Recovery: https://www.refugerecovery.org
-   - Women for Sobriety: https://womenforsobriety.org
-   - S.O.S.: https://www.sossobriety.org
-   - LifeRing: https://lifering.org
-   - She Recovers: https://sherecovers.org
-   - Celebrate Recovery: https://www.celebraterecovery.com
+The hybrid model (NA live + AA community + official links) is more honest than pretending we have live AA data.
 
 ---
 
