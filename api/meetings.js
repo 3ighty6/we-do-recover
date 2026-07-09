@@ -56,24 +56,37 @@ export default async function handler(req, res) {
   }
 
   async function getNA(lat, lng, radius) {
-    const rows = await j(`${BMLT}?switcher=GetSearchResults&lat_val=${lat}&long_val=${lng}&geo_width=${radius}&sort_keys=weekday_tinyint,start_time`);
-    if (!Array.isArray(rows)) return [];
-    return rows.filter(m => m.latitude && m.longitude && m.meeting_name).map(m => {
-      const la = +m.latitude, ln = +m.longitude;
-      const city = m.location_municipality || "";
-      return {
-        fellowship: "NA", name: (m.meeting_name || "").trim(),
-        day: (parseInt(m.weekday_tinyint, 10) - 1 + 7) % 7,
-        time: (m.start_time || "").slice(0, 5),
-        venue: m.location_text || "",
-        address: [m.location_street, city, m.location_province].filter(Boolean).join(", "),
-        city, lat: la, lng: ln, distance: +miles(lat, lng, la, ln).toFixed(1),
-        formats: m.formats ? m.formats.split(",") : [],
-        notes: m.comments || m.location_info || "",
-        online_url: m.virtual_meeting_link || "",
-        source: "BMLT worldwide directory", source_url: "https://bmlt.app", community: false,
-      };
-    });
+    // Use CORS proxy to bypass Vercel egress restrictions
+    const corsProxy = "https://api.allorigins.win/get?url=";
+    const bmltUrl = encodeURIComponent(`https://aggregator.bmltenabled.org/main_server/client_interface/json/?switcher=GetSearchResults&lat_val=${lat}&long_val=${lng}&geo_width=${radius}&sort_keys=weekday_tinyint,start_time`);
+    
+    try {
+      const r = await fetch(corsProxy + bmltUrl);
+      if (!r.ok) throw new Error(`Proxy ${r.status}`);
+      const wrapper = await r.json();
+      const rows = JSON.parse(wrapper.contents);
+      
+      if (!Array.isArray(rows)) return [];
+      return rows.filter(m => m.latitude && m.longitude && m.meeting_name).map(m => {
+        const la = +m.latitude, ln = +m.longitude;
+        const city = m.location_municipality || "";
+        return {
+          fellowship: "NA", name: (m.meeting_name || "").trim(),
+          day: (parseInt(m.weekday_tinyint, 10) - 1 + 7) % 7,
+          time: (m.start_time || "").slice(0, 5),
+          venue: m.location_text || "",
+          address: [m.location_street, city, m.location_province].filter(Boolean).join(", "),
+          city, lat: la, lng: ln, distance: +miles(lat, lng, la, ln).toFixed(1),
+          formats: m.formats ? m.formats.split(",") : [],
+          notes: m.comments || m.location_info || "",
+          online_url: m.virtual_meeting_link || "",
+          source: "BMLT worldwide directory", source_url: "https://bmlt.app", community: false,
+        };
+      });
+    } catch (err) {
+      console.error("BMLT fetch failed:", err.message);
+      return [];
+    }
   }
 
   async function getAA(lat, lng, radius) {
@@ -84,10 +97,18 @@ export default async function handler(req, res) {
 
   async function getCommunity(fellowship, lat, lng, radius) {
     try {
-      const rows = await j(
-        `${SUPA}/rest/v1/approved_meetings?fellowship=eq.${encodeURIComponent(fellowship)}&kind=eq.new&select=*`,
-        { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
+      // Use CORS proxy for Supabase too
+      const corsProxy = "https://api.allorigins.win/get?url=";
+      const supabaseUrl = encodeURIComponent(
+        `${SUPA}/rest/v1/approved_meetings?fellowship=eq.${encodeURIComponent(fellowship)}&kind=eq.new&select=*`
       );
+      const r = await fetch(corsProxy + supabaseUrl, {
+        headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
+      });
+      if (!r.ok) return [];
+      const wrapper = await r.json();
+      const rows = JSON.parse(wrapper.contents);
+      
       return rows.map(m => {
         const has = m.lat != null && m.lng != null;
         const d = has ? +miles(lat, lng, m.lat, m.lng).toFixed(1) : null;
@@ -104,11 +125,18 @@ export default async function handler(req, res) {
 
   async function getNotices(fellowship, lat, lng, radius) {
     try {
+      const corsProxy = "https://api.allorigins.win/get?url=";
       const now = new Date().toISOString();
-      const rows = await j(
-        `${SUPA}/rest/v1/approved_meetings?fellowship=eq.${encodeURIComponent(fellowship)}&kind=in.(temporary,change,remove)&select=*&order=created_at.desc&limit=25`,
-        { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
+      const supabaseUrl = encodeURIComponent(
+        `${SUPA}/rest/v1/approved_meetings?fellowship=eq.${encodeURIComponent(fellowship)}&kind=in.(temporary,change,remove)&select=*&order=created_at.desc&limit=25`
       );
+      const r = await fetch(corsProxy + supabaseUrl, {
+        headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
+      });
+      if (!r.ok) return [];
+      const wrapper = await r.json();
+      const rows = JSON.parse(wrapper.contents);
+      
       const cutoff = Date.now() - 21 * 86400e3;
       return rows.filter(n => {
         if (n.kind === "temporary") return !n.expires_at || n.expires_at > now;
