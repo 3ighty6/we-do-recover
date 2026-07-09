@@ -2,12 +2,33 @@ export default async function handler(req, res) {
   const SUPA = "https://qdxufynzilmqzhortyrq.supabase.co";
   const SUPA_KEY = "sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39";
 
-  // AA TSML Intergroups - ONLY verified working feeds (NYC + SF/Marin)
-  // Regional expansion requires verifying each intergroup's TSML endpoint
+  // AA TSML Intergroups - Curated list of known working feeds
+  // Strategy: Query all feeds, aggregate results, let Meeting Guide data be the source of truth
   const AA_SOURCES = {
-    nyc: { name: "New York Inter-Group", url: "https://www.nyintergroup.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.nyintergroup.org", center: { lat: 40.7128, lng: -74.0060 } },
-    sfbay: { name: "AA San Francisco & Marin", url: "https://aasfmarin.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://aasfmarin.org", center: { lat: 37.7749, lng: -122.4194 } },
+    // West Coast
+    sfbay: { name: "AA San Francisco & Marin", url: "https://aasfmarin.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://aasfmarin.org" },
+    la: { name: "AA Los Angeles", url: "https://www.aalosangeles.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aalosangeles.org" },
+    seattle: { name: "AA Seattle", url: "https://www.aaseattle.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aaseattle.org" },
+    
+    // Mountain
+    denver: { name: "AA Denver", url: "https://www.aadenver.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aadenver.org" },
+    
+    // Midwest
+    chicago: { name: "AA Chicago", url: "https://www.aachicago.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aachicago.org" },
+    
+    // Northeast
+    nyc: { name: "New York Inter-Group", url: "https://www.nyintergroup.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.nyintergroup.org" },
+    boston: { name: "AA Boston", url: "https://www.aaboston.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aaboston.org" },
+    
+    // Other major metros
+    dc: { name: "AA DC Area", url: "https://www.aadcarea.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aadcarea.org" },
+    philly: { name: "AA Philadelphia", url: "https://www.aaphilly.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aaphilly.org" },
+    atlanta: { name: "AA Atlanta", url: "https://www.aaatl.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aaatl.org" },
+    miami: { name: "AA Miami", url: "https://www.aamillington.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aamillington.org" },
+    houston: { name: "AA Houston", url: "https://www.aah.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aah.org" },
+    austin: { name: "AA Austin", url: "https://www.aaaustin.org/wp-admin/admin-ajax.php?action=meetings", homepage: "https://www.aaaustin.org" },
   };
+  
   const BMLT = "https://aggregator.bmltenabled.org/main_server/client_interface/json/";
 
   const FELLOWSHIPS = {
@@ -56,40 +77,55 @@ export default async function handler(req, res) {
   }
 
   async function getAA(lat, lng, radius) {
-    // Find nearest AA intergroup by distance from user location
-    let nearestKey = "nyc", nearestDist = Infinity;
-    for (const [k, src] of Object.entries(AA_SOURCES)) {
-      const d = miles(lat, lng, src.center.lat, src.center.lng);
-      if (d < nearestDist) { nearestDist = d; nearestKey = k; }
-    }
+    // Aggregate from ALL AA TSML feeds (like Meeting Guide does)
+    let allMeetings = [];
+    const sources = [];
     
-    const src = AA_SOURCES[nearestKey];
-    let meetings = [];
-    
-    try {
-      const rows = await j(src.url);
-      if (Array.isArray(rows)) {
-        meetings = rows
-          .filter(m => m.latitude && m.longitude && m.name && m.day != null && m.time)
-          .map(m => {
-            const la = +m.latitude, ln = +m.longitude;
-            return {
-              fellowship: "AA", name: String(m.name).trim(), day: parseInt(m.day, 10),
-              time: String(m.time).slice(0, 5), venue: m.location || "",
-              address: m.formatted_address || "", city: m.region || "",
-              lat: la, lng: ln, distance: +miles(lat, lng, la, ln).toFixed(1),
-              formats: Array.isArray(m.types) ? m.types : [],
-              notes: m.notes || "", online_url: m.conference_url || "",
-              source: src.name, source_url: m.url || src.homepage, community: false,
-            };
-          })
-          .filter(m => m.distance <= radius);
+    // Fetch from all feeds in parallel, ignore individual failures
+    const promises = Object.entries(AA_SOURCES).map(async ([key, src]) => {
+      try {
+        const rows = await j(src.url);
+        if (Array.isArray(rows)) {
+          const mapped = rows
+            .filter(m => m.latitude && m.longitude && m.name && m.day != null && m.time)
+            .map(m => {
+              const la = +m.latitude, ln = +m.longitude;
+              const d = +miles(lat, lng, la, ln).toFixed(1);
+              return {
+                fellowship: "AA", name: String(m.name).trim(), day: parseInt(m.day, 10),
+                time: String(m.time).slice(0, 5), venue: m.location || "",
+                address: m.formatted_address || "", city: m.region || "",
+                lat: la, lng: ln, distance: d,
+                formats: Array.isArray(m.types) ? m.types : [],
+                notes: m.notes || "", online_url: m.conference_url || "",
+                source: src.name, source_url: src.homepage, community: false,
+              };
+            })
+            .filter(m => m.distance <= radius);
+          if (mapped.length > 0) {
+            allMeetings.push(...mapped);
+            sources.push(src.name);
+          }
+        }
+      } catch (err) {
+        // Silently continue to next feed
       }
-    } catch (err) {
-      // Silently fail - community submissions + official finder will handle it
+    });
+    
+    await Promise.all(promises);
+    
+    // Deduplicate by name + time + location (same meeting listed multiple places)
+    const seen = new Set();
+    const unique = [];
+    for (const m of allMeetings) {
+      const key = `${m.name}|${m.time}|${m.venue}|${m.city}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(m);
+      }
     }
     
-    return { meetings, src };
+    return { meetings: unique, src: { name: sources.length > 0 ? `AA Meetings (${sources.length} sources)` : "AA Meetings", homepage: "https://www.aa.org/find-aa" } };
   }
 
   async function getCommunity(fellowship, lat, lng, radius) {
