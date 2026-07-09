@@ -77,55 +77,9 @@ export default async function handler(req, res) {
   }
 
   async function getAA(lat, lng, radius) {
-    // Aggregate from ALL AA TSML feeds (like Meeting Guide does)
-    let allMeetings = [];
-    const sources = [];
-    
-    // Fetch from all feeds in parallel, ignore individual failures
-    const promises = Object.entries(AA_SOURCES).map(async ([key, src]) => {
-      try {
-        const rows = await j(src.url);
-        if (Array.isArray(rows)) {
-          const mapped = rows
-            .filter(m => m.latitude && m.longitude && m.name && m.day != null && m.time)
-            .map(m => {
-              const la = +m.latitude, ln = +m.longitude;
-              const d = +miles(lat, lng, la, ln).toFixed(1);
-              return {
-                fellowship: "AA", name: String(m.name).trim(), day: parseInt(m.day, 10),
-                time: String(m.time).slice(0, 5), venue: m.location || "",
-                address: m.formatted_address || "", city: m.region || "",
-                lat: la, lng: ln, distance: d,
-                formats: Array.isArray(m.types) ? m.types : [],
-                notes: m.notes || "", online_url: m.conference_url || "",
-                source: src.name, source_url: src.homepage, community: false,
-              };
-            })
-            .filter(m => m.distance <= radius);
-          if (mapped.length > 0) {
-            allMeetings.push(...mapped);
-            sources.push(src.name);
-          }
-        }
-      } catch (err) {
-        // Silently continue to next feed
-      }
-    });
-    
-    await Promise.all(promises);
-    
-    // Deduplicate by name + time + location (same meeting listed multiple places)
-    const seen = new Set();
-    const unique = [];
-    for (const m of allMeetings) {
-      const key = `${m.name}|${m.time}|${m.venue}|${m.city}`.toLowerCase();
-      if (!seen.has(key)) {
-        seen.add(key);
-        unique.push(m);
-      }
-    }
-    
-    return { meetings: unique, src: { name: sources.length > 0 ? `AA Meetings (${sources.length} sources)` : "AA Meetings", homepage: "https://www.aa.org/find-aa" } };
+    // AA TSML fetching moved to CLIENT-SIDE (browser can fetch, server cannot)
+    // This endpoint now returns the intergroup data for the client to fetch
+    return { meetings: [], src: { name: "AA Meetings (client-side)", homepage: "https://www.aa.org/find-aa" }, aa_sources: AA_SOURCES };
   }
 
   async function getCommunity(fellowship, lat, lng, radius) {
@@ -188,7 +142,7 @@ export default async function handler(req, res) {
 
   const tasks = [];
   if (F.live === "bmlt") tasks.push(getNA(la, ln, rad).then(m => { out.meetings.push(...m); out.source = { name: "BMLT worldwide directory", homepage: "https://bmlt.app" }; }));
-  if (F.live === "tsml") tasks.push(getAA(la, ln, rad).then(r => { out.meetings.push(...r.meetings); out.source = { name: r.src.name, homepage: r.src.homepage }; }));
+  if (F.live === "tsml") tasks.push(getAA(la, ln, rad).then(r => { out.meetings.push(...r.meetings); out.source = { name: r.src.name, homepage: r.src.homepage }; out.aa_sources = r.aa_sources; }));
   tasks.push(getCommunity(fellowship, la, ln, rad).then(m => out.meetings.push(...m)));
   tasks.push(getNotices(fellowship, la, lng, rad).then(n => { out.notices = n; }));
 
