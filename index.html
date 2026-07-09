@@ -70,7 +70,8 @@
 <main id="main"></main>
 
 <footer>
-  Data from NA BMLT + community submissions. <a href="#" id="submit-btn">Submit a meeting</a>. Always confirm directly with the source — schedules change.
+  <strong>NA:</strong> Live from BMLT worldwide · <strong>Other fellowships:</strong> Community submissions only (help us grow!)
+  <br><a href="#" id="submit-btn" style="font-weight:700">Submit or update a meeting</a> · Always confirm directly with the source — schedules change.
 </footer>
 
 <div class="sheet hidden" id="sheet">
@@ -181,14 +182,23 @@ function render(){
     return;
   }
   
+  // Add banner for non-NA fellowships
+  let banner = '';
+  if (state.fellowship !== "NA") {
+    banner = `<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 14px;margin:8px 16px;border-radius:8px;font-size:13px;color:#92400e;line-height:1.5"><strong>Help us grow!</strong> We don't have live data for ${FELLOWSHIPS[state.fellowship]}. <a href="#" id="quick-submit-btn" style="color:#92400e;font-weight:700;text-decoration:underline">Submit meetings</a> in your area.</div>`;
+  }
+  
   const filtered = state.meetings.filter(m => m.day === state.day && (state.timeFilter==="all" || matchTime(m.time, state.timeFilter)));
   
   if (filtered.length === 0) {
-    main.innerHTML = `<div class="state">No meetings found for <strong>${DAYS[state.day]}</strong> within ${state.radius} miles.<br>Try another day or widen the radius.</div>`;
+    main.innerHTML = banner + `<div class="state">No meetings found for <strong>${DAYS[state.day]}</strong> within ${state.radius} miles.<br>Try another day or widen the radius.</div>`;
+    if (document.getElementById("quick-submit-btn")) {
+      document.getElementById("quick-submit-btn").onclick = (e) => { e.preventDefault(); openSubmitSheet(); };
+    }
     return;
   }
   
-  main.innerHTML = filtered.map(m => `
+  main.innerHTML = banner + filtered.map(m => `
     <div class="mtg" onclick="openSheet(${JSON.stringify(m).replace(/"/g,'&quot;')})">
       <div class="time">${m.time || "TBA"}</div>
       <div class="info">
@@ -198,6 +208,10 @@ function render(){
       </div>
     </div>
   `).join("");
+  
+  if (document.getElementById("quick-submit-btn")) {
+    document.getElementById("quick-submit-btn").onclick = (e) => { e.preventDefault(); openSubmitSheet(); };
+  }
 }
 
 function matchTime(t, filter){
@@ -234,8 +248,110 @@ document.getElementById("sheet").onclick = (e) => {
 
 document.getElementById("submit-btn").onclick = (e) => {
   e.preventDefault();
-  alert("Submit feature coming soon. Email: we-do-recover.app@example.com");
+  openSubmitSheet();
 };
+
+function openSubmitSheet(){
+  document.getElementById("sheet-body").innerHTML = `
+    <h2>Submit or Update a Meeting</h2>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:16px">Help keep this directory current. All submissions are reviewed and appear within 24 hours.</p>
+    <form id="submitForm" style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px">Type *</label>
+        <select name="kind" required style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font:inherit">
+          <option value="new">New meeting</option>
+          <option value="change">Update to existing meeting</option>
+          <option value="remove">Meeting no longer meets</option>
+          <option value="temporary">Temporary change (expires)</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px">Fellowship *</label>
+        <select name="fellowship" required style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font:inherit">
+          <option value="">Choose one...</option>
+          ${Object.entries(FELLOWSHIPS).map(([k,v]) => `<option value="${k}" ${k===state.fellowship?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px">Meeting Name *</label>
+        <input type="text" name="meeting_name" required placeholder="e.g., Morning Meditation Group" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font:inherit">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px">Venue</label>
+        <input type="text" name="venue" placeholder="e.g., Community Center" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font:inherit">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px">Address</label>
+        <input type="text" name="address" placeholder="e.g., 123 Main St" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font:inherit">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px">City</label>
+        <input type="text" name="city" placeholder="e.g., Columbus" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font:inherit">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px">Day *</label>
+        <select name="day" required style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font:inherit">
+          <option value="">Choose a day</option>
+          <option value="0">Sunday</option>
+          <option value="1">Monday</option>
+          <option value="2">Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5">Friday</option>
+          <option value="6">Saturday</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px">Time (HH:MM)</label>
+        <input type="time" name="time" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font:inherit">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px">Online URL</label>
+        <input type="url" name="online_url" placeholder="https://..." style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font:inherit">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin-bottom:4px">Details *</label>
+        <textarea name="details" required placeholder="Describe the meeting or what changed" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font:inherit;min-height:60px"></textarea>
+      </div>
+      <button type="submit" style="background:#1e3a8a;color:#fff;border:0;font-weight:700;padding:12px;border-radius:6px;cursor:pointer;font:inherit">Submit for Review</button>
+    </form>
+  `;
+  document.getElementById("sheet").classList.remove("hidden");
+  
+  document.getElementById("submitForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(document.getElementById("submitForm"));
+    const data = Object.fromEntries(fd);
+    data.day = parseInt(data.day, 10);
+    data.lat = state.loc?.lat;
+    data.lng = state.loc?.lng;
+    
+    try {
+      const res = await fetch("https://qdxufynzilmqzhortyrq.supabase.co/rest/v1/submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": "sb_publishable_DH4eF8AYI5K57iS9I3z4bQ_KvR2me39"
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (res.ok) {
+        document.getElementById("sheet-body").innerHTML = `
+          <div style="text-align:center;padding:40px 20px">
+            <h2 style="font-size:20px;margin-bottom:12px">✓ Thank You</h2>
+            <p style="color:#6b7280;margin-bottom:20px">Your submission has been received and will be reviewed within 24 hours.</p>
+            <button onclick="closeSheet()" style="background:#1e3a8a;color:#fff;border:0;font-weight:700;padding:10px 20px;border-radius:6px;cursor:pointer">Close</button>
+          </div>
+        `;
+      } else {
+        alert("Error submitting. Please try again.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  };
+}
 
 function locate(){
   navigator.geolocation.getCurrentPosition(p => {
